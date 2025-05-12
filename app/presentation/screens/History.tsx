@@ -1,10 +1,15 @@
 import React from 'react';
-import {Text, View} from 'react-native';
+import MeterList from './list/MeterList.tsx';
+import SearchBar from './houses/SearchBar.tsx';
+import Layout from '../components/Layout.tsx';
 const History = () => {
     return (
-        <View>
-            <Text>History</Text>
-        </View>
+        <>
+            <Layout>
+                <SearchBar />
+                <MeterList />
+            </Layout>
+        </>
     );
 };
 export default History;

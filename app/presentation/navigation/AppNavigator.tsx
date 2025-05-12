@@ -49,16 +49,6 @@ const AppNavigator = () => {
                     }}
                 />
                 <Tab.Screen
-                    name="Statistic"
-                    component={Statistic}
-                    options={{
-                        tabBarIcon: ({ color }) => (
-                            <Icon name="bar-chart" size={24} color={color} />
-                        ),
-                        tabBarLabel: 'Statistic',
-                    }}
-                />
-                <Tab.Screen
                     name="History"
                     component={History}
                     options={{
@@ -66,6 +56,16 @@ const AppNavigator = () => {
                             <Icon name="history" size={24} color={color} />
                         ),
                         tabBarLabel: 'History',
+                    }}
+                />
+                <Tab.Screen
+                    name="Statistic"
+                    component={Statistic}
+                    options={{
+                        tabBarIcon: ({ color }) => (
+                            <Icon name="bar-chart" size={24} color={color} />
+                        ),
+                        tabBarLabel: 'Statistic',
                     }}
                 />
                 <Tab.Screen
