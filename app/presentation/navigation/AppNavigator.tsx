@@ -3,7 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import HomeScreen from '../screens/HomeScreen';
-import Reading from '../screens/Reading.tsx';
+import Consumption from '../screens/Consumption.tsx';
 import Statistic from '../screens/Statistic.tsx';
 import History from '../screens/History.tsx';
 import Setting from '../screens/Setting.tsx';
@@ -39,13 +39,13 @@ const AppNavigator = () => {
                     }}
                 />
                 <Tab.Screen
-                    name="Reading"
-                    component={Reading}
+                    name="Consumption"
+                    component={Consumption}
                     options={{
                         tabBarIcon: ({ color }) => (
-                            <Icon name="th-list" size={24} color={color} />
+                            <Icon name="plus" size={24} color={color} />
                         ),
-                        tabBarLabel: 'Reading',
+                        tabBarLabel: 'Consumption',
                     }}
                 />
                 <Tab.Screen
