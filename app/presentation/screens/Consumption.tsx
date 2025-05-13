@@ -1,8 +1,8 @@
 import React from 'react';
-import MeterForm from './form/MeterForm.tsx';
+import ReadingForm from './form/ReadingForm.tsx';
 const Consumption = () => {
     return (
-            <MeterForm />
+            <ReadingForm />
     );
 };
 export default Consumption;
