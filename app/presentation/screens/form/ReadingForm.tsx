@@ -9,6 +9,8 @@ import {
     KeyboardAvoidingView,
     ScrollView
 } from 'react-native';
+import {useReadingRepository} from '../../hooks/useReadingRepository.ts';
+import {Reading} from "../../../core/domain/entities/Reading.ts";
 import { Formik, useFormikContext } from 'formik';
 import * as Yup from 'yup';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -208,6 +210,7 @@ const FormContent = () => {
 };
 
 const ReadingForm = () => {
+    const { addReadingUseCase } = useReadingRepository();
     // Valeur initiale du formulaire
     const initialValues: FormValues = {
         newInputDate: new Date(),
@@ -220,9 +223,23 @@ const ReadingForm = () => {
     };
 
     // Gestion de la soumission du formulaire
-    const handleSubmit = (values: FormValues) => {
-        console.log('Form values:', values);
-        // Traitez la soumission ici
+    const handleSubmit = async (values: FormValues) => {
+        try {
+            const reading = new Reading(
+                null, // ID sera généré par SQLite
+                values.newInputDate,
+                values.oldInputDate,
+                parseFloat(values.mainCounterValue),
+                parseFloat(values.newSubMeterValue),
+                parseFloat(values.oldSubMeterValue),
+                parseFloat(values.amountInvoice),
+                parseFloat(values.amountToPay)
+            );
+            await addReadingUseCase.execute(reading);
+            console.log('Reading saved successfully:', reading);
+        } catch (error) {
+            console.error('Error saving reading:', error);
+        }
     };
 
     return (
