@@ -10,13 +10,14 @@ import {
     ScrollView
 } from 'react-native';
 import {useReadingRepository} from '../../hooks/useReadingRepository.ts';
-import {Reading} from "../../../core/domain/entities/Reading.ts";
+import {Reading} from '../../../core/domain/entities/Reading.ts';
 import { Formik, useFormikContext } from 'formik';
 import * as Yup from 'yup';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { CalculateAmountToPayUseCase } from '../../../core/domain/usecases/CalculateAmountToPayUseCase';
 import {useCalculateAmountToPay} from '../../hooks/useCalculateAmountToPay.ts';
 import {FormValues} from '../../../core/domain/types/FormValues.ts';
+import Toast from 'react-native-toast-message';
 
 // Schéma de validation
 const validationSchema = Yup.object().shape({
@@ -223,7 +224,7 @@ const ReadingForm = () => {
     };
 
     // Gestion de la soumission du formulaire
-    const handleSubmit = async (values: FormValues) => {
+    const handleSubmit =async (values: FormValues, { resetForm }: { resetForm: () => void }) => {
         try {
             const reading = new Reading(
                 null, // ID sera généré par SQLite
@@ -237,8 +238,19 @@ const ReadingForm = () => {
             );
             await addReadingUseCase.execute(reading);
             console.log('Reading saved successfully:', reading);
+            Toast.show({
+                type: 'success',
+                text1: 'Success',
+                text2: 'The survey data was successfully saved.',
+            });
+            resetForm();
         } catch (error) {
             console.error('Error saving reading:', error);
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'An error occurred while saving data.',
+            });
         }
     };
 
