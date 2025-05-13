@@ -1,8 +1,12 @@
 import React from 'react';
-import MeterForm from './form/MeterForm.tsx';
+import ReadingForm from './form/ReadingForm.tsx';
+import Toast from 'react-native-toast-message';
 const Consumption = () => {
     return (
-            <MeterForm />
+        <>
+            <ReadingForm />
+            <Toast />
+        </>
     );
 };
 export default Consumption;
