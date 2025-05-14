@@ -1,5 +1,5 @@
 import SQLite from 'react-native-sqlite-storage';
-import { Reading } from '../../core/domain/entities/Reading';
+import { Reading } from '@/core/domain/entities/Reading.ts';
 SQLite.enablePromise(true);
 
 export class SQLiteService {

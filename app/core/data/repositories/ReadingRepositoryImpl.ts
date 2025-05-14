@@ -1,6 +1,6 @@
-import {ReadingRepository} from './ReadingRepository.ts';
-import {Reading} from '../entities/Reading.ts';
-import {SQLiteService} from '../../../infrastructure/storage/SQLiteService.ts';
+import {ReadingRepository} from '@/core/domain/repositories/ReadingRepository';
+import {Reading} from '@/core/domain/entities/Reading';
+import {SQLiteService} from '@/infrastructure/storage/SQLiteService.ts';
 export class ReadingRepositoryImpl implements ReadingRepository {
     private sqliteService: SQLiteService;
 

@@ -1,5 +1,5 @@
-import { Reading} from '../entities/Reading.ts';
-import {ReadingRepository} from '../repositories/ReadingRepository.ts';
+import {Reading} from '@/core/domain/entities/Reading';
+import {ReadingRepository} from '@/core/domain/repositories/ReadingRepository.ts';
 export class AddReadingUseCase {
     constructor(private readingRepository: ReadingRepository) {}
 

@@ -1,4 +1,4 @@
-import { Reading } from '../entities/Reading';
+import { Reading } from '@/core/domain/entities/Reading';
 export class CalculateAmountToPayUseCase{
     execute(reading: Reading): number {
         const subMeterConsumption = reading.newSubMeterValue - reading.oldSubMeterValue;

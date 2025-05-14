@@ -9,14 +9,14 @@ import {
     KeyboardAvoidingView,
     ScrollView
 } from 'react-native';
-import {useReadingRepository} from '../../hooks/useReadingRepository.ts';
-import {Reading} from '../../../core/domain/entities/Reading.ts';
+import {useReadingRepository} from '@/presentation/hooks/useReadingRepository';
+import {Reading} from '@/core/domain/entities/Reading.ts';
 import { Formik, useFormikContext } from 'formik';
 import * as Yup from 'yup';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { CalculateAmountToPayUseCase } from '../../../core/domain/usecases/CalculateAmountToPayUseCase';
-import {useCalculateAmountToPay} from '../../hooks/useCalculateAmountToPay.ts';
-import {FormValues} from '../../../core/domain/types/FormValues.ts';
+import { CalculateAmountToPayUseCase } from '@/core/domain/usecases/CalculateAmountToPayUseCase';
+import {useCalculateAmountToPay} from '@/presentation/hooks/useCalculateAmountToPay';
+import {FormValues} from '@/core/domain/types/FormValues.ts';
 import Toast from 'react-native-toast-message';
 
 // Schéma de validation
