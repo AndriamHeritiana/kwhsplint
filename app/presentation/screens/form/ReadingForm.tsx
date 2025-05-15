@@ -9,7 +9,6 @@ import {
     KeyboardAvoidingView,
     ScrollView, ActivityIndicator
 } from 'react-native';
-import {useReadingRepository} from '@/presentation/hooks/useReadingRepository';
 import {Reading} from '@/core/domain/entities/Reading.ts';
 import { Formik, useFormikContext } from 'formik';
 import * as Yup from 'yup';
@@ -51,7 +50,6 @@ const validationSchema = Yup.object().shape({
         .typeError('You must specify a number'),
 });
 
-// Composant interne pour encapsuler la logique du formulaire
 const FormContent = () => {
     const { values, errors, setFieldValue, submitForm } = useFormikContext<FormValues>();
     const calculateAmountToPayUseCase = useMemo(() => new CalculateAmountToPayUseCase(), []);
@@ -231,7 +229,6 @@ const ReadingForm = () => {
     useEffect(() => {
         dispatch(initializeDatabase());
     }, [dispatch]);
-    // Gestion de la soumission du formulaire
     const handleSubmit = async (values: FormValues, { resetForm }: { resetForm: () => void }) => {
         try {
             const reading = new Reading({
@@ -244,10 +241,8 @@ const ReadingForm = () => {
                 amountInvoice: parseFloat(values.amountInvoice),
                 amountToPay: parseFloat(values.amountToPay),
             });
-            console.log('valeur posté par le formulaire', reading);
             const readingToPlainO = readingToPlainObject(reading);
-            console.log('valeur posté par le formulaire apres plaintObjet', readingToPlainO);
-            await dispatch(addReading(reading)).unwrap(); // Dispatch l'action Redux
+            await dispatch(addReading(readingToPlainO)).unwrap(); // Dispatch l'action Redux
             Toast.show({
                 type: 'success',
                 text1: 'Success',
