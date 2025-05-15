@@ -1,5 +1,5 @@
 import SQLite from 'react-native-sqlite-storage';
-import { Reading } from '../../core/domain/entities/Reading';
+import { Reading } from '@/core/domain/entities/Reading.ts';
 SQLite.enablePromise(true);
 
 export class SQLiteService {
@@ -36,17 +36,17 @@ export class SQLiteService {
         await this.db.executeSql(query);
     }
 
-    async saveReading(reading: Reading): Promise<void>{
+    async saveReading(reading: Reading): Promise<void> {
         if (!this.db) throw new Error('Database not initialized');
         const query = `
-      INSERT INTO readings (
-        newInputDate, oldInputDate, mainCounterValue, newSubMeterValue,
-        oldSubMeterValue, amountInvoice, amountToPay
-      ) VALUES (?, ?, ?, ?, ?, ?, ?);
-    `;
+            INSERT INTO readings (
+                newInputDate, oldInputDate, mainCounterValue, newSubMeterValue,
+                oldSubMeterValue, amountInvoice, amountToPay
+            ) VALUES (?, ?, ?, ?, ?, ?, ?);
+        `;
         const values = [
-            reading.newInputDate.toISOString(),
-            reading.oldInputDate.toISOString(),
+            reading.newInputDate,
+            reading.oldInputDate,
             reading.mainCounterValue,
             reading.newSubMeterValue,
             reading.oldSubMeterValue,
@@ -55,31 +55,30 @@ export class SQLiteService {
         ];
         await this.db.executeSql(query, values);
     }
-
-    async getAllReadings(): Promise<Reading[]> {
+    async getAllReadings(): Promise<Omit<Reading, keyof Reading & 'constructor'>[]> {
         if (!this.db) throw new Error('Database not initialized');
 
         const query = `SELECT * FROM readings;`;
         const [results] = await this.db.executeSql(query);
-        const readings: Reading[] = [];
+        const readings = [];
 
         for (let i = 0; i < results.rows.length; i++) {
             const row = results.rows.item(i);
-            readings.push(
-                new Reading(
-                    row.id,
-                    new Date(row.newInputDate),
-                    new Date(row.oldInputDate),
-                    row.mainCounterValue,
-                    row.newSubMeterValue,
-                    row.oldSubMeterValue,
-                    row.amountInvoice,
-                    row.amountToPay
-                )
-            );
+            readings.push({
+                id: row.id,
+                newInputDate: new Date(row.newInputDate).toISOString(),
+                oldInputDate: new Date(row.oldInputDate).toISOString(),
+                mainCounterValue: row.mainCounterValue,
+                newSubMeterValue: row.newSubMeterValue,
+                oldSubMeterValue: row.oldSubMeterValue,
+                amountInvoice: row.amountInvoice,
+                amountToPay: row.amountToPay,
+            });
         }
+
         return readings;
     }
+
     async closeDatabase(): Promise<void> {
         if (this.db) {
             await this.db.close();

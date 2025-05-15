@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { CalculateAmountToPayUseCase } from '../../core/domain/usecases/CalculateAmountToPayUseCase';
+import { CalculateAmountToPayUseCase } from '@/core/domain/usecases/CalculateAmountToPayUseCase.ts';
 import {FormikErrors} from 'formik';
 interface FormValues {
     newInputDate: Date;
@@ -33,7 +33,7 @@ export const useCalculateAmountToPay = (
       !errors.mainCounterValue &&
       !errors.amountInvoice
     ) {
-      const reading = {
+      const reading : any = {
         newInputDate: values.newInputDate,
         oldInputDate: values.oldInputDate,
         mainCounterValue: parseFloat(mainCounterValue),
