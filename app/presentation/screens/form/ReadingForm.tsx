@@ -7,7 +7,7 @@ import {
     Platform,
     TextInput,
     KeyboardAvoidingView,
-    ScrollView
+    ScrollView, ActivityIndicator
 } from 'react-native';
 import {useReadingRepository} from '@/presentation/hooks/useReadingRepository';
 import {Reading} from '@/core/domain/entities/Reading.ts';
@@ -17,7 +17,11 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { CalculateAmountToPayUseCase } from '@/core/domain/usecases/CalculateAmountToPayUseCase';
 import {useCalculateAmountToPay} from '@/presentation/hooks/useCalculateAmountToPay';
 import {FormValues} from '@/core/domain/types/FormValues.ts';
+import { useSelector, useDispatch } from 'react-redux';
+import { addReading, initializeDatabase } from '@/presentation/state/redux/store/readingSlice';// Importer les actions Redux
+import { RootState, AppDispatch } from '@/presentation/state/redux/store/store';
 import Toast from 'react-native-toast-message';
+import {readingToPlainObject} from '@/core/utils/readingToPlainObject';
 
 // Schéma de validation
 const validationSchema = Yup.object().shape({
@@ -211,7 +215,8 @@ const FormContent = () => {
 };
 
 const ReadingForm = () => {
-    const { addReadingUseCase } = useReadingRepository();
+    const dispatch = useDispatch<AppDispatch>();
+    const { loading, error, isDbReady } = useSelector((state: RootState) => state.reading);
     // Valeur initiale du formulaire
     const initialValues: FormValues = {
         newInputDate: new Date(),
@@ -222,22 +227,27 @@ const ReadingForm = () => {
         amountInvoice: '',
         amountToPay: '00.0',
     };
-
+// Initialiser la base de données au montage du composant
+    useEffect(() => {
+        dispatch(initializeDatabase());
+    }, [dispatch]);
     // Gestion de la soumission du formulaire
-    const handleSubmit =async (values: FormValues, { resetForm }: { resetForm: () => void }) => {
+    const handleSubmit = async (values: FormValues, { resetForm }: { resetForm: () => void }) => {
         try {
-            const reading = new Reading(
-                null, // ID sera généré par SQLite
-                values.newInputDate,
-                values.oldInputDate,
-                parseFloat(values.mainCounterValue),
-                parseFloat(values.newSubMeterValue),
-                parseFloat(values.oldSubMeterValue),
-                parseFloat(values.amountInvoice),
-                parseFloat(values.amountToPay)
-            );
-            await addReadingUseCase.execute(reading);
-            console.log('Reading saved successfully:', reading);
+            const reading = new Reading({
+                id: null,
+                newInputDate: values.newInputDate.toISOString(), // Convertir Date en string
+                oldInputDate: values.oldInputDate.toISOString(), // Convertir Date en string
+                mainCounterValue: parseFloat(values.mainCounterValue),
+                newSubMeterValue: parseFloat(values.newSubMeterValue),
+                oldSubMeterValue: parseFloat(values.oldSubMeterValue),
+                amountInvoice: parseFloat(values.amountInvoice),
+                amountToPay: parseFloat(values.amountToPay),
+            });
+            console.log('valeur posté par le formulaire', reading);
+            const readingToPlainO = readingToPlainObject(reading);
+            console.log('valeur posté par le formulaire apres plaintObjet', readingToPlainO);
+            await dispatch(addReading(reading)).unwrap(); // Dispatch l'action Redux
             Toast.show({
                 type: 'success',
                 text1: 'Success',
@@ -253,7 +263,23 @@ const ReadingForm = () => {
             });
         }
     };
+// Afficher un indicateur de chargement si la base de données n'est pas prête
+    if (!isDbReady || loading) {
+        return (
+            <View style={styles.container}>
+                <ActivityIndicator size="large" color="#3498db" />
+            </View>
+        );
+    }
 
+    // Afficher un message d'erreur si présent
+    if (error) {
+        Toast.show({
+            type: 'error',
+            text1: 'Error',
+            text2: error,
+        });
+    }
     return (
         <KeyboardAvoidingView
             style={styles.container}

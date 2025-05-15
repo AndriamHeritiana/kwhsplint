@@ -1,13 +1,27 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ScrollView, View, Text } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import styles from '../../../state/context/styles/styles';
-import { useReadingHistory} from '@/presentation/hooks/useReadingHistory';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState, AppDispatch } from '@/presentation/state/redux/store/store';
+import { initializeDatabase, fetchReadings } from '@/presentation/state/redux/store/readingSlice';
 
 const MeterList = () => {
-    const { readings, loading } = useReadingHistory();
+    const dispatch = useDispatch<AppDispatch>();
+    const { readings, loading, isDbReady } = useSelector((state: RootState) => state.reading);
 
-    const formatDate = (date: Date) => {
+    useEffect(() => {
+        dispatch(initializeDatabase());
+    }, [dispatch]);
+
+    useEffect(() => {
+        if (isDbReady) {
+            dispatch(fetchReadings());
+        }
+    }, [isDbReady, dispatch]);
+
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
         return date.toLocaleDateString('en-US', {
             weekday: 'long',
             day: 'numeric',
@@ -21,7 +35,7 @@ const MeterList = () => {
 
     return (
         <ScrollView style={styles.wrapper}>
-            {readings.map((reading: any) => (
+            {readings.map((reading) => (
                 <View key={reading.id || Math.random()} style={styles.card}>
                     <View style={styles.topRow}>
                         <View style={styles.iconCircle}>

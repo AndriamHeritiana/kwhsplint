@@ -1,12 +1,30 @@
 export class Reading {
-    constructor(
-        public id: number | null,
-        public newInputDate: Date,
-        public oldInputDate: Date,
-        public mainCounterValue: number,
-        public newSubMeterValue: number,
-        public oldSubMeterValue: number,
-        public amountInvoice: number,
-        public amountToPay: number
-    ) {}
+    id: number | null;
+    newInputDate: string;
+    oldInputDate: string;
+    mainCounterValue: number;
+    newSubMeterValue: number;
+    oldSubMeterValue: number;
+    amountInvoice: number;
+    amountToPay: number;
+
+    constructor(data: {
+        id: number | null;
+        newInputDate: string;
+        oldInputDate: string;
+        mainCounterValue: number;
+        newSubMeterValue: number;
+        oldSubMeterValue: number;
+        amountInvoice: number;
+        amountToPay: number;
+    }) {
+        this.id = data.id;
+        this.newInputDate = data.newInputDate;
+        this.oldInputDate = data.oldInputDate;
+        this.mainCounterValue = data.mainCounterValue;
+        this.newSubMeterValue = data.newSubMeterValue;
+        this.oldSubMeterValue = data.oldSubMeterValue;
+        this.amountInvoice = data.amountInvoice;
+        this.amountToPay = data.amountToPay;
+    }
 }
