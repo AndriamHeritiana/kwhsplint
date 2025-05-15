@@ -58,7 +58,7 @@ export class SQLiteService {
     async getAllReadings(): Promise<Omit<Reading, keyof Reading & 'constructor'>[]> {
         if (!this.db) throw new Error('Database not initialized');
 
-        const query = `SELECT * FROM readings;`;
+        const query = `SELECT * FROM readings ORDER BY id DESC;`;
         const [results] = await this.db.executeSql(query);
         const readings = [];
 

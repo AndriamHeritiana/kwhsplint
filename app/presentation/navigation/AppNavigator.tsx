@@ -9,13 +9,14 @@ import Consumption from '../screens/Consumption.tsx';
 import Statistic from '../screens/Statistic.tsx';
 import History from '../screens/History.tsx';
 import Setting from '../screens/Setting.tsx';
-
+import { navigationRef } from '@/presentation/navigation/ref/navigationRef.ts';
+import Toast from 'react-native-toast-message';
 const Tab = createBottomTabNavigator();
 
 const AppNavigator = () => {
-    return (
+   return (
         <Provider store={store}>
-            <NavigationContainer>
+            <NavigationContainer ref={navigationRef}>
                 <Tab.Navigator
                     initialRouteName="Home"
                     screenOptions={{
@@ -83,6 +84,7 @@ const AppNavigator = () => {
                     />
                 </Tab.Navigator>
             </NavigationContainer>
+            <Toast />
         </Provider>
     );
 };
