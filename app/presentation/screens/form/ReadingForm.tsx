@@ -21,7 +21,6 @@ import { addReading, initializeDatabase } from '@/presentation/state/redux/store
 import { RootState, AppDispatch } from '@/presentation/state/redux/store/store';
 import Toast from 'react-native-toast-message';
 import {readingToPlainObject} from '@/core/utils/readingToPlainObject';
-
 // Schéma de validation
 const validationSchema = Yup.object().shape({
     newInputDate: Yup.date()
