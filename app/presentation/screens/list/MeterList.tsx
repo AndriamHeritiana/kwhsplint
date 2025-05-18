@@ -42,7 +42,7 @@ const MeterList = () => {
                             <Icon name="flash" size={20} color="#4A90E2" />
                         </View>
                         <View style={styles.infoSection}>
-                            <Text style={styles.placeName}>Tana, ANOSISOA</Text>
+                            <Text style={styles.placeName}>{reading.city}, {reading.residence}</Text>
                             <Text style={styles.subtitle}>Consumption: {reading.mainCounterValue}</Text>
                         </View>
                         <View style={styles.locationBox}>

@@ -30,19 +30,36 @@ export class SQLiteService {
                                                     newSubMeterValue REAL NOT NULL,
                                                     oldSubMeterValue REAL NOT NULL,
                                                     amountInvoice REAL NOT NULL,
-                                                    amountToPay REAL NOT NULL
+                                                    amountToPay REAL NOT NULL,
+                                                    residence TEXT NOT NULL,
+                                                    city TEXT NOT NULL
             );
         `;
         await this.db.executeSql(query);
+        // Vérifier et ajouter les colonnes 'residence' et 'city' si elles n'existent pas
+        try {
+            const [pragmaResult] = await this.db.executeSql('PRAGMA table_info(readings);');
+            const columns = pragmaResult.rows.raw().map((row: any) => row.name);
+
+            if (!columns.includes('residence')) {
+                await this.db.executeSql("ALTER TABLE readings ADD COLUMN residence TEXT NOT NULL DEFAULT '';");
+            }
+            if (!columns.includes('city')) {
+                await this.db.executeSql("ALTER TABLE readings ADD COLUMN city TEXT NOT NULL DEFAULT '';");
+            }
+        } catch (error) {
+            console.error('Erreur lors de la migration du schéma :', error);
+            throw error;
+        }
     }
 
     async saveReading(reading: Reading): Promise<void> {
-        if (!this.db) throw new Error('Database not initialized');
+        if (!this.db) throw new Error('Base de données non initialisée');
         const query = `
             INSERT INTO readings (
                 newInputDate, oldInputDate, mainCounterValue, newSubMeterValue,
-                oldSubMeterValue, amountInvoice, amountToPay
-            ) VALUES (?, ?, ?, ?, ?, ?, ?);
+                oldSubMeterValue, amountInvoice, amountToPay, residence, city
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
         `;
         const values = [
             reading.newInputDate,
@@ -52,6 +69,8 @@ export class SQLiteService {
             reading.oldSubMeterValue,
             reading.amountInvoice,
             reading.amountToPay,
+            reading.residence,
+            reading.city,
         ];
         await this.db.executeSql(query, values);
     }
@@ -73,6 +92,8 @@ export class SQLiteService {
                 oldSubMeterValue: row.oldSubMeterValue,
                 amountInvoice: row.amountInvoice,
                 amountToPay: row.amountToPay,
+                residence: row.residence,
+                city: row.city,
             });
         }
 

@@ -47,6 +47,10 @@ const validationSchema = Yup.object().shape({
         .required('Amount to pay is required')
         .positive('Value must be positive')
         .typeError('You must specify a number'),
+    residence: Yup.string()
+        .required('Residence is required'),
+    city: Yup.string()
+        .required('City is required'),
 });
 
 const FormContent = () => {
@@ -191,6 +195,36 @@ const FormContent = () => {
                 )}
             </View>
 
+            {/* Residence Section */}
+            <View style={styles.section}>
+                <Text style={styles.label}>Residence:</Text>
+                <TextInput
+                    style={styles.inputField}
+                    value={values.residence}
+                    onChangeText={(text) => setFieldValue('residence', text)}
+                    onBlur={() => setFieldValue('residence', values.residence, true)}
+                    placeholder="Enter residence"
+                />
+                {errors.residence && values.residence && (
+                    <Text style={styles.errorText}>{errors.residence}</Text>
+                )}
+            </View>
+
+            {/* City Section */}
+            <View style={styles.section}>
+                <Text style={styles.label}>City:</Text>
+                <TextInput
+                    style={styles.inputField}
+                    value={values.city}
+                    onChangeText={(text) => setFieldValue('city', text)}
+                    onBlur={() => setFieldValue('city', values.city, true)}
+                    placeholder="Enter city"
+                />
+                {errors.city && values.city && (
+                    <Text style={styles.errorText}>{errors.city}</Text>
+                )}
+            </View>
+
             {/* Amount you have to pay Section */}
             <View style={styles.section}>
                 <Text style={styles.label}>Amount you have to pay:</Text>
@@ -223,6 +257,8 @@ const ReadingForm = () => {
         oldSubMeterValue: '',
         amountInvoice: '',
         amountToPay: '00.0',
+        residence: '',
+        city: '',
     };
 // Initialiser la base de données au montage du composant
     useEffect(() => {
@@ -239,6 +275,8 @@ const ReadingForm = () => {
                 oldSubMeterValue: parseFloat(values.oldSubMeterValue),
                 amountInvoice: parseFloat(values.amountInvoice),
                 amountToPay: parseFloat(values.amountToPay),
+                residence: values.residence,
+                city: values.city,
             });
             const readingToPlainO = readingToPlainObject(reading);
             await dispatch(addReading(readingToPlainO)).unwrap(); // Dispatch l'action Redux

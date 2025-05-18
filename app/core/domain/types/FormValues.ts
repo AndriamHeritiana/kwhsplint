@@ -6,4 +6,6 @@ export interface FormValues {
     oldSubMeterValue: string;
     amountInvoice: string;
     amountToPay: string;
+    residence: string;
+    city: string;
 }
