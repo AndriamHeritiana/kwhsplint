@@ -4,23 +4,27 @@ import { SQLiteService } from '@/infrastructure/storage/SQLiteService.ts';
 import { ReadingRepositoryImpl } from '@/core/data/repositories/ReadingRepositoryImpl.ts';
 import { GetHistoryUseCase } from '@/core/domain/usecases/GetHistoryUseCase.ts';
 import { AddReadingUseCase } from '@/core/domain/usecases/AddReadingUseCase.ts';
+import {GetTwoLastHistoryUseCase} from '@/core/domain/usecases/GetTwoLastHistoryUseCase';
 
 // Initialisation des services
 const sqliteService = new SQLiteService();
 const readingRepository = new ReadingRepositoryImpl(sqliteService);
 const getHistoryUseCase = new GetHistoryUseCase(readingRepository);
+const getTwoLastHistoryUseCase = new GetTwoLastHistoryUseCase(readingRepository);
 const addReadingUseCase = new AddReadingUseCase(readingRepository);
 
 // État initial
 interface ReadingState {
-    readings: Reading[];
+    homeReadings: Reading[]; // Pour HomeScreen (2 dernières lectures)
+    historyReadings: Reading[]; // Pour HistoryScreen (toutes les lectures)
     loading: boolean;
     error: string | null;
     isDbReady: boolean;
 }
 
 const initialState: ReadingState = {
-    readings: [],
+    homeReadings: [],
+    historyReadings: [],
     loading: false,
     error: null,
     isDbReady: false,
@@ -37,6 +41,9 @@ export const fetchReadings = createAsyncThunk('reading/fetchReadings', async (se
     return await getHistoryUseCase.execute(searchTerm);
 });
 
+export const fetchTwoLastReadings = createAsyncThunk('reading/fetchTwoLastReadings', async (searchTerm?: string) => {
+    return await getTwoLastHistoryUseCase.execute(searchTerm);
+});
 // Thunk pour ajouter une lecture
 export const addReading = createAsyncThunk('reading/addReading', async (reading: Reading) => {
     await addReadingUseCase.execute(reading);
@@ -69,10 +76,21 @@ const readingSlice = createSlice({
                 state.loading = true;
             })
             .addCase(fetchReadings.fulfilled, (state, action) => {
-                state.readings = action.payload;
+                state.historyReadings = action.payload;
                 state.loading = false;
             })
             .addCase(fetchReadings.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message || 'Erreur lors de la récupération des lectures';
+            })
+            .addCase(fetchTwoLastReadings.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(fetchTwoLastReadings.fulfilled, (state, action) => {
+                state.homeReadings = action.payload;
+                state.loading = false;
+            })
+            .addCase(fetchTwoLastReadings.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.error.message || 'Erreur lors de la récupération des lectures';
             })
@@ -80,7 +98,7 @@ const readingSlice = createSlice({
                 state.loading = true;
             })
             .addCase(addReading.fulfilled, (state, action) => {
-                state.readings = [action.payload, ...state.readings]; // Ajoute la nouvelle lecture en tête de liste
+                state.historyReadings = [action.payload, ...state.historyReadings]; // Ajoute la nouvelle lecture en tête de liste
                 state.loading = false;
             })
             .addCase(addReading.rejected, (state, action) => {

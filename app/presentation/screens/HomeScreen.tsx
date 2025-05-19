@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
     SafeAreaView,
 } from 'react-native';
@@ -7,7 +7,7 @@ import SearchBar from './houses/SearchBar.tsx';
 import ConsumptionCard from './houses/ConsumptionCard.tsx';
 import Layout from '../components/Layout.tsx';
 const HomeScreen = () => {
-
+    const [searchTerm, setSearchTerm] = useState<string>('');
     return (
         <Layout>
         <SafeAreaView>
@@ -15,10 +15,10 @@ const HomeScreen = () => {
             <HouseProfileCard />
 
             {/* Section 2: Barre de recherche */}
-            <SearchBar />
+            <SearchBar onSearch={setSearchTerm}  />
 
             {/* Section 3: Liste */}
-            <ConsumptionCard />
+            <ConsumptionCard searchTerm={searchTerm} />
         </SafeAreaView>
         </Layout>
     );
