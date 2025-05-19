@@ -6,7 +6,10 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '@/presentation/state/redux/store/store';
 import { initializeDatabase, fetchReadings } from '@/presentation/state/redux/store/readingSlice';
 
-const MeterList = () => {
+interface MeterListProps {
+    searchTerm: string; // Nouvelle prop pour le terme de recherche
+}
+const MeterList: React.FC<MeterListProps> = ({ searchTerm }) => {
     const dispatch = useDispatch<AppDispatch>();
     const { readings, loading, isDbReady } = useSelector((state: RootState) => state.reading);
 
@@ -16,9 +19,9 @@ const MeterList = () => {
 
     useEffect(() => {
         if (isDbReady) {
-            dispatch(fetchReadings());
+            dispatch(fetchReadings(searchTerm));
         }
-    }, [isDbReady, dispatch]);
+    }, [isDbReady, dispatch, searchTerm]);
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);

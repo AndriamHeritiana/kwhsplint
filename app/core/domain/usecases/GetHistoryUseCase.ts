@@ -4,7 +4,7 @@ export class GetHistoryUseCase {
     constructor(private readingRepository: ReadingRepository) {
     }
 
-    async execute(): Promise<Reading[]> {
-        return await this.readingRepository.getAll();
+    async execute(searchTerm?: string): Promise<Reading[]> {
+        return await this.readingRepository.getAll(searchTerm); // Passe searchTerm
     }
 }

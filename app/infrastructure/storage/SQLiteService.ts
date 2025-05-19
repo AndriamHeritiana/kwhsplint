@@ -36,6 +36,16 @@ export class SQLiteService {
             );
         `;
         await this.db.executeSql(query);
+        // Créer les index
+        const createIndexesQueries = [
+            `CREATE INDEX IF NOT EXISTS idx_residence ON readings(residence)`,
+            `CREATE INDEX IF NOT EXISTS idx_city ON readings(city)`,
+            `CREATE INDEX IF NOT EXISTS idx_amountInvoice ON readings(amountInvoice)`
+        ];
+
+        for (const queryIndex of createIndexesQueries) {
+            await this.db.executeSql(queryIndex);
+        }
         // Vérifier et ajouter les colonnes 'residence' et 'city' si elles n'existent pas
         try {
             const [pragmaResult] = await this.db.executeSql('PRAGMA table_info(readings);');
@@ -74,11 +84,25 @@ export class SQLiteService {
         ];
         await this.db.executeSql(query, values);
     }
-    async getAllReadings(): Promise<Omit<Reading, keyof Reading & 'constructor'>[]> {
+    async getReadings(searchTerm?: string, limit?: number): Promise<Omit<Reading, keyof Reading & 'constructor'>[]> {
         if (!this.db) throw new Error('Database not initialized');
 
-        const query = `SELECT * FROM readings ORDER BY id DESC;`;
-        const [results] = await this.db.executeSql(query);
+        let query = `SELECT * FROM readings`;
+        let params: string[] = [];
+
+        if (searchTerm) {
+            const sanitizedSearchTerm = searchTerm.replace(/[^a-zA-Z0-9\s]/g, '');
+            query += ` WHERE residence LIKE ? OR city LIKE ? OR amountInvoice LIKE ?`;
+            params = [`%${sanitizedSearchTerm}%`, `%${sanitizedSearchTerm}%`, `%${sanitizedSearchTerm}%`];
+        }
+
+        query += ` ORDER BY id DESC`;
+        if (limit && limit > 0) {
+            query += ` LIMIT ?`;
+            params.push(limit.toString());
+        }
+
+        const [results] = await this.db.executeSql(query, params);
         const readings = [];
 
         for (let i = 0; i < results.rows.length; i++) {
@@ -99,7 +123,6 @@ export class SQLiteService {
 
         return readings;
     }
-
     async closeDatabase(): Promise<void> {
         if (this.db) {
             await this.db.close();
