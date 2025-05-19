@@ -99,6 +99,7 @@ const readingSlice = createSlice({
             })
             .addCase(addReading.fulfilled, (state, action) => {
                 state.historyReadings = [action.payload, ...state.historyReadings]; // Ajoute la nouvelle lecture en tête de liste
+                state.homeReadings = [action.payload, ...state.homeReadings]; // Ajoute la nouvelle lecture en tête de liste
                 state.loading = false;
             })
             .addCase(addReading.rejected, (state, action) => {
