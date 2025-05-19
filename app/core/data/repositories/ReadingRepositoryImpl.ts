@@ -12,7 +12,11 @@ export class ReadingRepositoryImpl implements ReadingRepository {
         await this.sqliteService.saveReading(reading);
     }
 
-    async getAll(): Promise<Reading[]> {
-        return await this.sqliteService.getAllReadings();
+    async getAll(searchTerm?: string): Promise<Reading[]> {
+        return await this.sqliteService.getReadings(searchTerm);
+    }
+
+    async getTwoLastReadings(searchTerm?: string): Promise<Reading[]> {
+        return await this.sqliteService.getReadings(searchTerm, 2);
     }
 }

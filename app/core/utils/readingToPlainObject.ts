@@ -10,5 +10,7 @@ export function readingToPlainObject(reading: Reading) {
         oldSubMeterValue: reading.oldSubMeterValue,
         amountInvoice: reading.amountInvoice,
         amountToPay: reading.amountToPay,
+        residence: reading.residence,
+        city: reading.city,
     };
 }

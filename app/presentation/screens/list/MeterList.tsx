@@ -6,7 +6,10 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '@/presentation/state/redux/store/store';
 import { initializeDatabase, fetchReadings } from '@/presentation/state/redux/store/readingSlice';
 
-const MeterList = () => {
+interface MeterListProps {
+    searchTerm: string; // Nouvelle prop pour le terme de recherche
+}
+const MeterList: React.FC<MeterListProps> = ({ searchTerm }) => {
     const dispatch = useDispatch<AppDispatch>();
     const { readings, loading, isDbReady } = useSelector((state: RootState) => state.reading);
 
@@ -16,9 +19,9 @@ const MeterList = () => {
 
     useEffect(() => {
         if (isDbReady) {
-            dispatch(fetchReadings());
+            dispatch(fetchReadings(searchTerm));
         }
-    }, [isDbReady, dispatch]);
+    }, [isDbReady, dispatch, searchTerm]);
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
@@ -42,7 +45,7 @@ const MeterList = () => {
                             <Icon name="flash" size={20} color="#4A90E2" />
                         </View>
                         <View style={styles.infoSection}>
-                            <Text style={styles.placeName}>Tana, ANOSISOA</Text>
+                            <Text style={styles.placeName}>{reading.city}, {reading.residence}</Text>
                             <Text style={styles.subtitle}>Consumption: {reading.mainCounterValue}</Text>
                         </View>
                         <View style={styles.locationBox}>

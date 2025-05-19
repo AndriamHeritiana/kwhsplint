@@ -7,6 +7,8 @@ export class Reading {
     oldSubMeterValue: number;
     amountInvoice: number;
     amountToPay: number;
+    residence: string;
+    city: string;
 
     constructor(data: {
         id: number | null;
@@ -17,6 +19,8 @@ export class Reading {
         oldSubMeterValue: number;
         amountInvoice: number;
         amountToPay: number;
+        residence: string;
+        city: string;
     }) {
         this.id = data.id;
         this.newInputDate = data.newInputDate;
@@ -26,5 +30,7 @@ export class Reading {
         this.oldSubMeterValue = data.oldSubMeterValue;
         this.amountInvoice = data.amountInvoice;
         this.amountToPay = data.amountToPay;
+        this.residence = data.residence;
+        this.city = data.city;
     }
 }

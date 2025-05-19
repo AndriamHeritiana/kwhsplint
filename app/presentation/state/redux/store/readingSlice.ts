@@ -33,16 +33,14 @@ export const initializeDatabase = createAsyncThunk('reading/initializeDatabase',
 });
 
 // Thunk pour récupérer les lectures
-export const fetchReadings = createAsyncThunk('reading/fetchReadings', async () => {
-    const readings = await getHistoryUseCase.execute();
-    return readings;
+export const fetchReadings = createAsyncThunk('reading/fetchReadings', async (searchTerm?: string) => {
+    return await getHistoryUseCase.execute(searchTerm);
 });
 
 // Thunk pour ajouter une lecture
 export const addReading = createAsyncThunk('reading/addReading', async (reading: Reading) => {
     await addReadingUseCase.execute(reading);
-    const readings = await getHistoryUseCase.execute(); // Recharger les lectures après ajout
-    return readings;
+    return reading; // Retourne uniquement la nouvelle lecture ajoutée
 });
 
 // Slice Redux
@@ -82,7 +80,7 @@ const readingSlice = createSlice({
                 state.loading = true;
             })
             .addCase(addReading.fulfilled, (state, action) => {
-                state.readings = action.payload;
+                state.readings = [action.payload, ...state.readings]; // Ajoute la nouvelle lecture en tête de liste
                 state.loading = false;
             })
             .addCase(addReading.rejected, (state, action) => {
