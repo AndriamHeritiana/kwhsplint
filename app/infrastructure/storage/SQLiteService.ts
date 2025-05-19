@@ -1,5 +1,6 @@
 import SQLite from 'react-native-sqlite-storage';
 import { Reading } from '@/core/domain/entities/Reading.ts';
+import { runMigrations } from './migrations';
 SQLite.enablePromise(true);
 
 export class SQLiteService {
@@ -11,54 +12,9 @@ export class SQLiteService {
                 name: 'meter_reading.db',
                 location: 'default',
             });
-            await this.createTables();
+            await runMigrations(this.db); // Utiliser le système de migration
         } catch (error) {
-            console.error('Error opening database:', error);
-            throw error;
-        }
-    }
-
-    private async createTables(): Promise<void> {
-        if (!this.db) throw new Error('Database not initialized');
-
-        const query = `
-            CREATE TABLE IF NOT EXISTS readings (
-                                                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                                    newInputDate TEXT NOT NULL,
-                                                    oldInputDate TEXT NOT NULL,
-                                                    mainCounterValue REAL NOT NULL,
-                                                    newSubMeterValue REAL NOT NULL,
-                                                    oldSubMeterValue REAL NOT NULL,
-                                                    amountInvoice REAL NOT NULL,
-                                                    amountToPay REAL NOT NULL,
-                                                    residence TEXT NOT NULL,
-                                                    city TEXT NOT NULL
-            );
-        `;
-        await this.db.executeSql(query);
-        // Créer les index
-        const createIndexesQueries = [
-            `CREATE INDEX IF NOT EXISTS idx_residence ON readings(residence)`,
-            `CREATE INDEX IF NOT EXISTS idx_city ON readings(city)`,
-            `CREATE INDEX IF NOT EXISTS idx_amountInvoice ON readings(amountInvoice)`
-        ];
-
-        for (const queryIndex of createIndexesQueries) {
-            await this.db.executeSql(queryIndex);
-        }
-        // Vérifier et ajouter les colonnes 'residence' et 'city' si elles n'existent pas
-        try {
-            const [pragmaResult] = await this.db.executeSql('PRAGMA table_info(readings);');
-            const columns = pragmaResult.rows.raw().map((row: any) => row.name);
-
-            if (!columns.includes('residence')) {
-                await this.db.executeSql("ALTER TABLE readings ADD COLUMN residence TEXT NOT NULL DEFAULT '';");
-            }
-            if (!columns.includes('city')) {
-                await this.db.executeSql("ALTER TABLE readings ADD COLUMN city TEXT NOT NULL DEFAULT '';");
-            }
-        } catch (error) {
-            console.error('Erreur lors de la migration du schéma :', error);
+            console.error('Erreur lors de l’ouverture de la base de données :', error);
             throw error;
         }
     }
