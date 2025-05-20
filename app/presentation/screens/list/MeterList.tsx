@@ -5,13 +5,14 @@ import styles from '../../../state/context/styles/styles';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '@/presentation/state/redux/store/store';
 import { initializeDatabase, fetchReadings } from '@/presentation/state/redux/store/readingSlice';
-
+import { formatDate } from '@/core/utils/dateUtils';
+import SkeletonCard from'@/presentation/screens/skeleton/SkeletonCard';
 interface MeterListProps {
     searchTerm: string; // Nouvelle prop pour le terme de recherche
 }
 const MeterList: React.FC<MeterListProps> = ({ searchTerm }) => {
     const dispatch = useDispatch<AppDispatch>();
-    const { readings, loading, isDbReady } = useSelector((state: RootState) => state.reading);
+    const { historyReadings: readings, loading, isDbReady } = useSelector((state: RootState) => state.reading);
 
     useEffect(() => {
         dispatch(initializeDatabase());
@@ -23,17 +24,14 @@ const MeterList: React.FC<MeterListProps> = ({ searchTerm }) => {
         }
     }, [isDbReady, dispatch, searchTerm]);
 
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('en-US', {
-            weekday: 'long',
-            day: 'numeric',
-            month: 'long',
-        });
-    };
-
     if (loading) {
-        return <Text>Chargement...</Text>;
+        return (
+                <ScrollView style={styles.wrapper}>
+                    {[...Array(3)].map((_, index) => (
+                        <SkeletonCard key={index} />
+                    ))}
+                </ScrollView>
+        );
     }
 
     return (
