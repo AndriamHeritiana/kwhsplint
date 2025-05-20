@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 import {
     View,
-    Text,
+    Text, ScrollView,
 } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '@/presentation/state/redux/store/store';
@@ -9,6 +9,7 @@ import {initializeDatabase, fetchTwoLastReadings} from '@/presentation/state/red
 import Icon from 'react-native-vector-icons/FontAwesome';
 import styles from '../../../state/context/styles/styles';
 import { formatDate } from '@/core/utils/dateUtils';
+import SkeletonCard from "@/presentation/screens/skeleton/SkeletonCard.tsx";
 interface MeterListProps {
     searchTerm: string; // Nouvelle prop pour le terme de recherche
 }
@@ -27,7 +28,13 @@ const ConsumptionCard: React.FC<MeterListProps> = ({ searchTerm }) => {
     }, [isDbReady, dispatch, searchTerm]);
 
     if (loading) {
-        return <Text>Chargement...</Text>;
+        return (
+            <ScrollView style={styles.wrapper}>
+                {[...Array(2)].map((_, index) => (
+                    <SkeletonCard key={index} />
+                ))}
+            </ScrollView>
+        );
     }
     return (
         <View style={styles.wrapper}>
