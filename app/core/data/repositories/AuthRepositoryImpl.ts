@@ -1,4 +1,4 @@
-import { AuthRepository } from "../../domain/usecases/user/AuthUseCases";
+import { AuthRepository} from "@/core/domain/repositories/AuthRepository.ts";
 import { AuthDataSource } from "../datasources/AuthDataSource";
 import { User } from "../../domain/entities/User";
 

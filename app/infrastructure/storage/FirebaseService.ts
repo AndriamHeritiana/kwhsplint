@@ -1,11 +1,9 @@
-import { FirebaseAuthDataSource } from "@/core/data/datasources/FirebaseAuthDataSource.ts";
-import { AuthRepositoryImpl } from "@/core/data/repositories/AuthRepositoryImpl.ts";
-import {
-    SignInUseCase,
-    SignUpUseCase,
-    SignOutUseCase,
-    GetCurrentUserUseCase,
-} from "@/core/domain/usecases/user/AuthUseCases.ts";
+import { FirebaseAuthDataSource } from '@/core/data/datasources/FirebaseAuthDataSource';
+import { AuthRepositoryImpl } from '@/core/data/repositories/AuthRepositoryImpl';
+import { SignInUseCase } from '@/core/domain/usecases/user/SignInUseCase';
+import { SignUpUseCase } from '@/core/domain/usecases/user/SignUpUseCase';
+import { SignOutUseCase } from '@/core/domain/usecases/user/SignOutUseCase';
+import { GetCurrentUserUseCase } from '@/core/domain/usecases/user/GetCurrentUserUseCase';
 
 export class FirebaseService {
     private static authDataSource = new FirebaseAuthDataSource();
