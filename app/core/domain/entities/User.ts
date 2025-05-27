@@ -5,4 +5,5 @@ export interface User {
     photoURL?: string;
     createdAt: string;
     updatedAt?: string;
+    address?: string;
 }

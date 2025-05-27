@@ -3,8 +3,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import {Provider, useDispatch, useSelector} from 'react-redux';
-import {AppDispatch, store} from '../state/redux/store/store';
+import { Provider, useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, store } from '../state/redux/store/store';
 import { selectUser } from '../state/redux/selectors/authSelectors';
 import { getCurrentUser } from '../state/redux/slices/authSlice';
 import HomeScreen from '../screens/HomeScreen';
@@ -12,7 +12,8 @@ import Consumption from '../screens/Consumption';
 import Statistic from '../screens/Statistic';
 import History from '../screens/History';
 import Setting from '../screens/Setting';
-import AuthScreen from '../screens/AuthScreen';
+import SignInScreen from '../screens/SignInScreen';
+import SignUpScreen from '../screens/SignUpScreen';
 import { navigationRef } from './ref/navigationRef';
 import Toast from 'react-native-toast-message';
 
@@ -94,7 +95,10 @@ const AppNavigator = () => {
                 {user ? (
                     <Stack.Screen name="Main" component={TabNavigator} />
                 ) : (
-                    <Stack.Screen name="Auth" component={AuthScreen} />
+                    <>
+                        <Stack.Screen name="SignIn" component={SignInScreen} />
+                        <Stack.Screen name="SignUp" component={SignUpScreen} />
+                    </>
                 )}
             </Stack.Navigator>
             <Toast />
