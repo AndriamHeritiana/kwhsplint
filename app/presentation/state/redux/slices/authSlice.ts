@@ -23,8 +23,8 @@ export const signIn = createAsyncThunk(
 
 export const signUp = createAsyncThunk(
     "auth/signUp",
-    async ({ email, password, displayName }: { email: string; password: string; displayName?: string }) => {
-        return await FirebaseService.getSignUpUseCase().execute(email, password, displayName);
+    async ({ email, password, latitude, longitude, displayName }: { email: string; password: string; latitude: string; longitude: string; displayName?: string }) => {
+        return await FirebaseService.getSignUpUseCase().execute(email, password, latitude, longitude, displayName);
     }
 );
 

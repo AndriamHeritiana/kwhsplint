@@ -48,8 +48,8 @@ const SignUpScreen: React.FC<RegistrationFormProps> = ({ onFocusChange }) => {
         name: "",
         email: "",
         password: "",
-        latitude: "-18.8906289", // Initialized with mocked values
-        longitude: "47.5336022",
+        latitude: "",
+        longitude: "",
     });
 
     const [errors, setErrors] = useState<FormErrors>({});
@@ -140,6 +140,8 @@ const SignUpScreen: React.FC<RegistrationFormProps> = ({ onFocusChange }) => {
                         email: formData.email,
                         password: formData.password,
                         displayName: formData.name,
+                        latitude: formData.latitude,
+                        longitude: formData.longitude,
                     })
                 ).unwrap();
                 Alert.alert(

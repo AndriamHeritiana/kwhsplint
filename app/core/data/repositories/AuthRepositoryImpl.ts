@@ -9,8 +9,8 @@ export class AuthRepositoryImpl implements AuthRepository {
         return this.authDataSource.signIn(email, password);
     }
 
-    async signUp(email: string, password: string, displayName?: string): Promise<User> {
-        return this.authDataSource.signUp(email, password, displayName);
+    async signUp(email: string, password: string,latitude: string, longitude: string,  displayName?: string): Promise<User> {
+        return this.authDataSource.signUp(email, password, latitude, longitude, displayName);
     }
 
     async signOut(): Promise<void> {

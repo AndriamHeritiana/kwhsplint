@@ -6,4 +6,6 @@ export interface User {
     createdAt: string;
     updatedAt?: string;
     address?: string;
+    latitude: string;
+    longitude: string;
 }

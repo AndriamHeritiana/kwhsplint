@@ -57,8 +57,8 @@ export class FirebaseAuthDataSource implements AuthDataSource {
             // Fetch city and address from Firestore
             const userDoc = await firestore().collection('users').doc(user.uid).get();
             // @ts-ignore
-            const { address } = userDoc.exists ? userDoc.data() || {} : {};
-
+            const { address, latitude, longitude } = userDoc.exists ? userDoc.data() || {} : {};
+            console.log('User data from Firestore:', { address, latitude, longitude });
             return {
                 id: user.uid,
                 email: user.email || '',
@@ -66,50 +66,67 @@ export class FirebaseAuthDataSource implements AuthDataSource {
                 photoURL: user.photoURL || undefined,
                 createdAt: user.metadata.creationTime || new Date().toISOString(),
                 updatedAt: user.metadata.lastSignInTime || undefined,
-                address,
+                address: address,
+                latitude: latitude,
+                longitude: longitude,
             };
         } catch (error: any) {
             throw new Error(`Erreur de connexion : ${error.message}`);
         }
     }
 
-    async signUp(email: string, password: string, displayName?: string): Promise<User> {
+    async signUp(email: string, password: string, latitude: string, longitude: string, displayName?: string): Promise<User> {
         try {
-            // Use mocked coordinates for testing
-            const mockedLatitude = -18.8736393;
-            const mockedLongitude = 47.49265;
 
-            // Reverse geocode using Nominatim with mocked coordinates
-            const { address } = await reverseGeocode(mockedLatitude, mockedLongitude);
+            console.log('lat:', parseFloat(latitude));
+            console.log('long:', parseFloat(longitude));
 
-            // Create user in Firebase Authentication
+            // Reverse geocode using Nominatim with latitude and longitude coordinates
+            const { address } = await reverseGeocode(parseFloat(latitude), parseFloat(longitude));
+
+            // If we reach here, coordinates are valid and geocoding succeeded
+            // Now create user in Firebase Authentication
             const userCredential = await auth().createUserWithEmailAndPassword(email, password);
             const user = userCredential.user;
 
-            // Update displayName if provided
-            if (displayName) {
-                await user.updateProfile({ displayName });
+            try {
+                // Update displayName if provided
+                if (displayName) {
+                    await user.updateProfile({ displayName });
+                }
+
+                // Store city and address in Firestore
+                await firestore().collection('users').doc(user.uid).set(
+                    {
+                        address,
+                        createdAt: new Date().toISOString(),
+                        latitude: parseFloat(latitude),
+                        longitude: parseFloat(longitude),
+                    },
+                    { merge: true }
+                );
+
+                return {
+                    id: user.uid,
+                    email: user.email || '',
+                    displayName: user.displayName || undefined,
+                    photoURL: user.photoURL || undefined,
+                    createdAt: user.metadata.creationTime || new Date().toISOString(),
+                    updatedAt: user.metadata.lastSignInTime || undefined,
+                    latitude: latitude,
+                    longitude: longitude,
+                    address,
+                };
+            } catch (firestoreError: any) {
+                // If Firestore fails, delete the created user from Firebase Auth
+                await user.delete();
+                throw new Error(`Erreur lors de la sauvegarde des données : ${firestoreError.message}`);
             }
-
-            // Store city and address in Firestore
-            await firestore().collection('users').doc(user.uid).set(
-                { address, createdAt: new Date().toISOString() },
-                { merge: true }
-            );
-
-            return {
-                id: user.uid,
-                email: user.email || '',
-                displayName: user.displayName || undefined,
-                photoURL: user.photoURL || undefined,
-                createdAt: user.metadata.creationTime || new Date().toISOString(),
-                updatedAt: user.metadata.lastSignInTime || undefined,
-                address,
-            };
         } catch (error: any) {
             throw new Error(`Erreur d'inscription : ${error.message}`);
         }
     }
+
 
     async signOut(): Promise<void> {
         try {
@@ -126,7 +143,7 @@ export class FirebaseAuthDataSource implements AuthDataSource {
         // Fetch city and address from Firestore
         const userDoc = await firestore().collection('users').doc(user.uid).get();
         // @ts-ignore
-        const { address } = userDoc.exists ? userDoc.data() || {} : {};
+        const { address, latitude, longitude } = userDoc.exists ? userDoc.data() || {} : {};
 
         return {
             id: user.uid,
@@ -135,7 +152,9 @@ export class FirebaseAuthDataSource implements AuthDataSource {
             photoURL: user.photoURL || undefined,
             createdAt: user.metadata.creationTime || new Date().toISOString(),
             updatedAt: user.metadata.lastSignInTime || undefined,
-            address,
+            address: address,
+            latitude: latitude,
+            longitude: longitude,
         };
     }
 }
