@@ -7,6 +7,7 @@ import { RootState, AppDispatch } from '@/presentation/state/redux/store/store';
 import { initializeDatabase, fetchReadings } from '@/presentation/state/redux/store/readingSlice';
 import { formatDate } from '@/core/utils/dateUtils';
 import SkeletonCard from'@/presentation/screens/skeleton/SkeletonCard';
+import MeterEmptyList from "@/presentation/screens/list/MeterEmptyList.tsx";
 interface MeterListProps {
     searchTerm: string; // Nouvelle prop pour le terme de recherche
 }
@@ -34,6 +35,14 @@ const MeterList: React.FC<MeterListProps> = ({ searchTerm }) => {
         );
     }
 
+    // Afficher MetterEmptyList si la liste est vide
+    if (readings.length === 0) {
+        return (
+            <ScrollView style={styles.wrapper}>
+                <MeterEmptyList />
+            </ScrollView>
+        );
+    }
     return (
         <ScrollView style={styles.wrapper}>
             {readings.map((reading) => (
