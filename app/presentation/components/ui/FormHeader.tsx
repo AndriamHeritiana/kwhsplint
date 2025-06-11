@@ -4,8 +4,17 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { colors } from "@/state/context/styles/colors.ts";
 import { typography } from "@/state/context/styles/typography.ts";
 
+interface FormHeaderProps {
+    title?: string;
+    subtitle?: string;
+    iconName?: string;
+}
 
-const FormHeader: React.FC = () => {
+const FormHeader: React.FC<FormHeaderProps> = ({
+                                                   title = "Se connecter",
+                                                   subtitle = "Veuillez saisir vos informations ci-dessous",
+                                                   iconName = "user"
+                                               }) => {
     const fadeAnim = useRef(new Animated.Value(0)).current;
     const slideAnim = useRef(new Animated.Value(20)).current;
     const iconScaleAnim = useRef(new Animated.Value(0.5)).current;
@@ -47,8 +56,7 @@ const FormHeader: React.FC = () => {
                     }
                 ]}
             >
-                <Icon name="user" size={32} color={colors.white} />
-                {/*<User size={32} color={colors.white} />*/}
+                <Icon name={iconName} size={32} color={colors.white} />
             </Animated.View>
 
             <Animated.Text
@@ -60,7 +68,7 @@ const FormHeader: React.FC = () => {
                     }
                 ]}
             >
-                Create Your Account
+                {title}
             </Animated.Text>
 
             <Animated.Text
@@ -72,7 +80,7 @@ const FormHeader: React.FC = () => {
                     }
                 ]}
             >
-                Please fill in your information below
+                {subtitle}
             </Animated.Text>
         </View>
     );

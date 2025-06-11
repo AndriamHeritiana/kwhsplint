@@ -166,7 +166,11 @@ const SignUpScreen: React.FC<RegistrationFormProps> = ({ onFocusChange }) => {
 
     return (
         <View style={styles.container}>
-            <FormHeader />
+            <FormHeader
+                title="Créer votre compte"
+                subtitle="Veuillez remplir vos informations ci-dessous"
+                iconName="user-plus"
+            />
             <FormInput
                 label="Full Name"
                 value={formData.name}
