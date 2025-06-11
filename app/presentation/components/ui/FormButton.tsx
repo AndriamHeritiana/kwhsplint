@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
     },
     primaryButton: {
-        backgroundColor: colors.primary[500],
+        backgroundColor: colors.primary[1000],
     },
     secondaryButton: {
         backgroundColor: colors.secondary[500],

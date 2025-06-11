@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { View, TextInput, Alert, StyleSheet, Animated } from "react-native";
+import { View, TextInput, Alert, StyleSheet, Animated, ScrollView, KeyboardAvoidingView, Platform, } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { signUp } from "../state/redux/slices/authSlice";
 import { selectAuthLoading, selectAuthError } from "../state/redux/selectors/authSelectors";
@@ -165,7 +165,16 @@ const SignUpScreen: React.FC<RegistrationFormProps> = ({ onFocusChange }) => {
     };
 
     return (
-        <View style={styles.container}>
+        <KeyboardAvoidingView
+            style={styles.keyboardAvoidingView}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
+            <ScrollView
+                style={styles.scrollView}
+                contentContainerStyle={styles.scrollViewContent}
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={false}
+            >
             <FormHeader
                 title="Créer votre compte"
                 subtitle="Veuillez remplir vos informations ci-dessous"
@@ -254,13 +263,21 @@ const SignUpScreen: React.FC<RegistrationFormProps> = ({ onFocusChange }) => {
                     size="large"
                 />
             </Animated.View>
-        </View>
+            </ScrollView>
+        </KeyboardAvoidingView>
     );
 };
 
 const styles = StyleSheet.create({
-    container: {
+    keyboardAvoidingView: {
         flex: 1,
+        backgroundColor: '#fff',
+    },
+    scrollView: {
+        flex: 1,
+    },
+    scrollViewContent: {
+        flexGrow: 1,
         paddingHorizontal: 20,
         paddingVertical: 16,
         paddingTop: 24,

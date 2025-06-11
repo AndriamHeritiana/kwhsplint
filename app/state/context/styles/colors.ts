@@ -12,6 +12,7 @@ export const colors = {
         700: '#2D45BD',
         800: '#253894',
         900: '#1F2D6D',
+        1000: '#4A90E2',
     },
 
     // Secondary colors
@@ -99,5 +100,6 @@ export const colors = {
     // Common colors
     white: '#FFFFFF',
     black: '#000000',
+    blue: '#4A90E2',
     transparent: 'transparent',
 };

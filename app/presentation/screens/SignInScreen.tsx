@@ -1,5 +1,14 @@
 import React, { useState, useRef } from "react";
-import { View, Text, Alert, StyleSheet, TextInput, Animated } from "react-native";
+import {
+    Text,
+    Alert,
+    StyleSheet,
+    TextInput,
+    Animated,
+    ScrollView,
+    KeyboardAvoidingView,
+    Platform,
+} from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { signIn } from "../state/redux/slices/authSlice";
 import { selectAuthLoading, selectAuthError } from "../state/redux/selectors/authSelectors";
@@ -108,7 +117,16 @@ const SignInScreen: React.FC = () => {
     };
 
     return (
-        <View style={styles.container}>
+        <KeyboardAvoidingView
+            style={styles.keyboardAvoidingView}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
+        <ScrollView
+                style={styles.scrollView}
+                contentContainerStyle={styles.scrollViewContent}
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={false}
+            >
             <FormHeader />
 
             <FormInput
@@ -154,17 +172,24 @@ const SignInScreen: React.FC = () => {
             />
 
             {error && <Text style={styles.errorText}>{error}</Text>}
-        </View>
+        </ScrollView>
+    </KeyboardAvoidingView>
     );
 };
 
 const styles = StyleSheet.create({
-    container: {
+    keyboardAvoidingView: {
         flex: 1,
+        backgroundColor: '#fff',
+    },
+    scrollView: {
+        flex: 1,
+    },
+    scrollViewContent: {
+        flexGrow: 1,
         paddingHorizontal: 20,
         paddingVertical: 16,
         paddingTop: 24,
-        backgroundColor: '#fff',
     },
     submitButton: {
         marginTop: 16,
