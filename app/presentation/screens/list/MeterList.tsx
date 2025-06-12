@@ -8,22 +8,26 @@ import { initializeDatabase, fetchReadings } from '@/presentation/state/redux/st
 import { formatDate } from '@/core/utils/dateUtils';
 import SkeletonCard from'@/presentation/screens/skeleton/SkeletonCard';
 import MeterEmptyList from "@/presentation/screens/list/MeterEmptyList.tsx";
+import { selectUser } from "@/presentation/state/redux/selectors/authSelectors";
+import { selectAuthIsReady } from "@/presentation/state/redux/selectors/authSelectors";
+import {string} from "yup";
 interface MeterListProps {
     searchTerm: string; // Nouvelle prop pour le terme de recherche
 }
 const MeterList: React.FC<MeterListProps> = ({ searchTerm }) => {
     const dispatch = useDispatch<AppDispatch>();
     const { historyReadings: readings, loading, isDbReady } = useSelector((state: RootState) => state.reading);
-
+    const user = useSelector(selectUser);
+    const isAuthReady = useSelector(selectAuthIsReady);
     useEffect(() => {
         dispatch(initializeDatabase());
     }, [dispatch]);
 
     useEffect(() => {
-        if (isDbReady) {
-            dispatch(fetchReadings(searchTerm));
+        if (isDbReady && isAuthReady && user) {
+            dispatch(fetchReadings({ userId: user.id, searchTerm }));
         }
-    }, [isDbReady, dispatch, searchTerm]);
+    }, [isDbReady, isAuthReady, user, dispatch, searchTerm]);
 
     if (loading) {
         return (
@@ -34,7 +38,9 @@ const MeterList: React.FC<MeterListProps> = ({ searchTerm }) => {
                 </ScrollView>
         );
     }
-
+    if (!isAuthReady) {
+        return null; // ou <LoadingSpinner />
+    }
     // Afficher MetterEmptyList si la liste est vide
     if (readings.length === 0) {
         return (

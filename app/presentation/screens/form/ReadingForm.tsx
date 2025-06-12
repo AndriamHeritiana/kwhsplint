@@ -21,55 +21,38 @@ import { addReading, initializeDatabase } from '@/presentation/state/redux/store
 import { RootState, AppDispatch } from '@/presentation/state/redux/store/store';
 import Toast from 'react-native-toast-message';
 import {readingToPlainObject} from '@/core/utils/readingToPlainObject';
-// Schéma de validation
-const validationSchema = Yup.object().shape({
-    newInputDate: Yup.date()
-        .required('Date is required')
-        .min(new Date(), 'The date cannot be in the past'),
-    oldInputDate: Yup.date().required('Old date is required'),
-    mainCounterValue: Yup.number()
-        .required('Main counter value is required')
-        .positive('Value must be positive')
-        .typeError('You must specify a number'),
-    newSubMeterValue: Yup.number()
-        .required('Sub-meter value is required')
-        .positive('Value must be positive')
-        .typeError('You must specify a number'),
-    oldSubMeterValue: Yup.number()
-        .required('Sub-meter value is required')
-        .positive('Value must be positive')
-        .typeError('You must specify a number'),
-    amountInvoice: Yup.number()
-        .required('Amount in invoice is required')
-        .positive('Value must be positive')
-        .typeError('You must specify a number'),
-    amountToPay: Yup.number()
-        .required('Amount to pay is required')
-        .positive('Value must be positive')
-        .typeError('You must specify a number'),
-    residence: Yup.string()
-        .required('Residence is required'),
-    city: Yup.string()
-        .required('City is required'),
-});
-
+import {selectAuthIsReady, selectUser} from "@/presentation/state/redux/selectors/authSelectors.ts";
+import { readingFormValidationSchema } from "@/presentation/screens/schema/validationSchema.ts";
 const FormContent = () => {
     const { values, errors, setFieldValue, submitForm } = useFormikContext<FormValues>();
     const calculateAmountToPayUseCase = useMemo(() => new CalculateAmountToPayUseCase(), []);
     const [showPicker, setShowPicker] = useState(false);
     const [showOldPicker, setShowOldPicker] = useState(false);
-
-    // Calculer amountToPay avec le hook personnalisé
+    const user = useSelector(selectUser);
+    const isAuthReady = useSelector(selectAuthIsReady);
+    // Calculate Amenttopay with the personalized hook
     const amountToPay = useCalculateAmountToPay(values, errors, calculateAmountToPayUseCase);
-    // Calcul automatique de amountToPay lorsque les champs nécessaires changent
-    // Mettre à jour amountToPay dans le formulaire
+    // Automatic calculation of Amentopay when the necessary fields change
+    // Update Amenttopay in the form
     useEffect(() => {
         setFieldValue('amountToPay', amountToPay);
     }, [amountToPay, setFieldValue]);
-
+    // Userid update in the form when the user is available
+    useEffect(() => {
+        if (user?.id && isAuthReady) {
+            setFieldValue('userId', user.id.toString());
+        }
+    }, [user?.id, isAuthReady, setFieldValue]);
 
     return (
         <View style={styles.formContainer}>
+            {/* Input hidden pour l'user.id */}
+            <TextInput
+                style={{ display: 'none' }}
+                value={values.userId || ''}
+                onChangeText={(text) => setFieldValue('userId', text)}
+                editable={false}
+            />
             {/* Date Sections */}
             <View style={styles.rowSection}>
                 <View style={styles.inputGroup}>
@@ -248,8 +231,9 @@ const FormContent = () => {
 const ReadingForm = () => {
     const dispatch = useDispatch<AppDispatch>();
     const { loading, error, isDbReady } = useSelector((state: RootState) => state.reading);
-    // Valeur initiale du formulaire
+    // Initial value of the form
     const initialValues: FormValues = {
+        userId: '',
         newInputDate: new Date(),
         oldInputDate: new Date(),
         mainCounterValue: '',
@@ -260,7 +244,7 @@ const ReadingForm = () => {
         residence: '',
         city: '',
     };
-// Initialiser la base de données au montage du composant
+// Initialize the database to the component assembly
     useEffect(() => {
         dispatch(initializeDatabase());
     }, [dispatch]);
@@ -268,6 +252,7 @@ const ReadingForm = () => {
         try {
             const reading = new Reading({
                 id: null,
+                userId: values.userId,
                 newInputDate: values.newInputDate.toISOString(), // Convertir Date en string
                 oldInputDate: values.oldInputDate.toISOString(), // Convertir Date en string
                 mainCounterValue: parseFloat(values.mainCounterValue),
@@ -295,7 +280,7 @@ const ReadingForm = () => {
             });
         }
     };
-// Afficher un indicateur de chargement si la base de données n'est pas prête
+// Display a loading indicator if the database is not ready
     if (!isDbReady || loading) {
         return (
             <View style={styles.container}>
@@ -304,7 +289,7 @@ const ReadingForm = () => {
         );
     }
 
-    // Afficher un message d'erreur si présent
+    // Show an error message if present
     if (error) {
         Toast.show({
             type: 'error',
@@ -326,7 +311,7 @@ const ReadingForm = () => {
 
                 <Formik
                     initialValues={initialValues}
-                    validationSchema={validationSchema}
+                    validationSchema={readingFormValidationSchema}
                     onSubmit={handleSubmit}
                     validateOnChange={true}
                     validateOnBlur={true}

@@ -37,12 +37,17 @@ export const initializeDatabase = createAsyncThunk('reading/initializeDatabase',
 });
 
 // Thunk pour récupérer les lectures
-export const fetchReadings = createAsyncThunk('reading/fetchReadings', async (searchTerm?: string) => {
-    return await getHistoryUseCase.execute(searchTerm);
-});
+export const fetchReadings = createAsyncThunk(
+    'reading/fetchReadings',
+    async ({ userId, searchTerm }: { userId: string; searchTerm?: string }) => {
+        return await getHistoryUseCase.execute(userId, searchTerm);
+    }
+);
 
-export const fetchTwoLastReadings = createAsyncThunk('reading/fetchTwoLastReadings', async (searchTerm?: string) => {
-    return await getTwoLastHistoryUseCase.execute(searchTerm);
+export const fetchTwoLastReadings = createAsyncThunk(
+    'reading/fetchTwoLastReadings',
+    async ({ userId, searchTerm }: { userId: string; searchTerm?: string }) => {
+    return await getTwoLastHistoryUseCase.execute(userId, searchTerm);
 });
 // Thunk pour ajouter une lecture
 export const addReading = createAsyncThunk('reading/addReading', async (reading: Reading) => {

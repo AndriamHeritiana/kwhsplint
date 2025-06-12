@@ -1,4 +1,5 @@
 export interface FormValues {
+    userId: string;
     newInputDate: Date;
     oldInputDate: Date;
     mainCounterValue: string;

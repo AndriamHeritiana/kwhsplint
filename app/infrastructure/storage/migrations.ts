@@ -15,28 +15,30 @@ const migrations: Migration[] = [
         up: async (db: SQLite.SQLiteDatabase) => {
             // Créer la table schema_version pour suivre les migrations
             await db.executeSql(`
-        CREATE TABLE IF NOT EXISTS schema_version (
-          version INTEGER PRIMARY KEY
-        );
-      `);
+                CREATE TABLE IF NOT EXISTS schema_version (
+                                                              version INTEGER PRIMARY KEY
+                );
+            `);
 
             // Créer la table readings avec les champs pris en charge
             await db.executeSql(`
-        CREATE TABLE IF NOT EXISTS readings (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          newInputDate TEXT NOT NULL,
-          oldInputDate TEXT NOT NULL,
-          mainCounterValue REAL NOT NULL,
-          newSubMeterValue REAL NOT NULL,
-          oldSubMeterValue REAL NOT NULL,
-          amountInvoice REAL NOT NULL,
-          amountToPay REAL NOT NULL
-        );
-      `);
+                CREATE TABLE IF NOT EXISTS readings (
+                                                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                                        userId TEXT NOT NULL,
+                                                        newInputDate TEXT NOT NULL,
+                                                        oldInputDate TEXT NOT NULL,
+                                                        mainCounterValue REAL NOT NULL,
+                                                        newSubMeterValue REAL NOT NULL,
+                                                        oldSubMeterValue REAL NOT NULL,
+                                                        amountInvoice REAL NOT NULL,
+                                                        amountToPay REAL NOT NULL
+                );
+            `);
 
             // Créer les index pour optimiser les recherches
             const createIndexesQueries = [
                 `CREATE INDEX IF NOT EXISTS idx_amountInvoice ON readings(amountInvoice)`,
+                `CREATE INDEX IF NOT EXISTS idx_userId ON readings(userId)`, // Index pour userId
             ];
 
             for (const queryIndex of createIndexesQueries) {
@@ -71,6 +73,23 @@ const migrations: Migration[] = [
             }
         },
     },
+    {
+        version: 3,
+        description: 'Ajout de la colonne userId pour lier les lectures aux utilisateurs',
+        up: async (db: SQLite.SQLiteDatabase) => {
+            // Vérifier si la colonne userId existe déjà
+            const [pragmaResult] = await db.executeSql('PRAGMA table_info(readings);');
+            const columns = pragmaResult.rows.raw().map((row: any) => row.name);
+
+            if (!columns.includes('userId')) {
+                // Ajouter la colonne userId
+                await db.executeSql("ALTER TABLE readings ADD COLUMN userId TEXT NOT NULL DEFAULT '';");
+
+                // Créer un index pour optimiser les requêtes par userId
+                await db.executeSql(`CREATE INDEX IF NOT EXISTS idx_userId ON readings(userId)`);
+            }
+        },
+    },
 ];
 
 // Fonction pour exécuter les migrations
@@ -96,7 +115,7 @@ export async function runMigrations(db: SQLite.SQLiteDatabase): Promise<void> {
             }
         }
     } catch (error) {
-        console.error('Erreur lors de l’exécution des migrations :', error);
+        console.error('Erreur lors de l\'exécution des migrations :', error);
         throw error;
     }
 }

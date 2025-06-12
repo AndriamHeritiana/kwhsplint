@@ -1,5 +1,6 @@
 export class Reading {
     id: number | null;
+    userId: string;
     newInputDate: string;
     oldInputDate: string;
     mainCounterValue: number;
@@ -12,6 +13,7 @@ export class Reading {
 
     constructor(data: {
         id: number | null;
+        userId: string;
         newInputDate: string;
         oldInputDate: string;
         mainCounterValue: number;
@@ -23,6 +25,7 @@ export class Reading {
         city: string;
     }) {
         this.id = data.id;
+        this.userId = data.userId;
         this.newInputDate = data.newInputDate;
         this.oldInputDate = data.oldInputDate;
         this.mainCounterValue = data.mainCounterValue;
