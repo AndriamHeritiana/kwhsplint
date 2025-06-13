@@ -5,7 +5,7 @@ export class GetTwoLastHistoryUseCase {
     constructor(private readingRepository: ReadingRepository) {
     }
 
-    async execute(searchTerm?: string): Promise<Reading[]> {
-        return await this.readingRepository.getTwoLastReadings(searchTerm); // Passe searchTerm
+    async execute(userId: string, searchTerm?: string): Promise<Reading[]> {
+        return await this.readingRepository.getTwoLastReadings(userId, searchTerm); // Passe searchTerm
     }
 }

@@ -25,6 +25,7 @@ interface FormInputProps {
     returnKeyType?: 'done' | 'next' | 'go' | 'search' | 'send';
     onSubmitEditing?: () => void;
     blurOnSubmit?: boolean;
+    editable?: boolean;
     autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
 }
 
@@ -41,6 +42,7 @@ const FormInput = forwardRef<TextInput, FormInputProps>(({
                                                              returnKeyType,
                                                              onSubmitEditing,
                                                              blurOnSubmit,
+                                                             editable = true,
                                                              autoCapitalize = 'none',
                                                          }, ref) => {
     const [isFocused, setIsFocused] = useState(false);
@@ -147,6 +149,7 @@ const FormInput = forwardRef<TextInput, FormInputProps>(({
                             returnKeyType={returnKeyType}
                             onSubmitEditing={onSubmitEditing}
                             blurOnSubmit={blurOnSubmit}
+                            editable={editable}
                             autoCapitalize={autoCapitalize}
                         />
                         {secureTextEntry && (

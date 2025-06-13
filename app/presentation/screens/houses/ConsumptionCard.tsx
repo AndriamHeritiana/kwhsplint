@@ -11,22 +11,24 @@ import styles from '../../../state/context/styles/styles';
 import { formatDate } from '@/core/utils/dateUtils';
 import SkeletonCard from "@/presentation/screens/skeleton/SkeletonCard.tsx";
 import MeterEmptyList from "@/presentation/screens/list/MeterEmptyList.tsx";
+import {selectAuthIsReady, selectUser} from "@/presentation/state/redux/selectors/authSelectors.ts";
 interface MeterListProps {
     searchTerm: string; // Nouvelle prop pour le terme de recherche
 }
 const ConsumptionCard: React.FC<MeterListProps> = ({ searchTerm }) => {
     const dispatch = useDispatch<AppDispatch>();
     const { homeReadings: readings, loading, isDbReady } = useSelector((state: RootState) => state.reading);
-
+    const user = useSelector(selectUser);
+    const isAuthReady = useSelector(selectAuthIsReady);
     useEffect(() => {
         dispatch(initializeDatabase());
     }, [dispatch]);
 
     useEffect(() => {
-        if (isDbReady) {
-            dispatch(fetchTwoLastReadings(searchTerm));
+        if (isDbReady && isAuthReady && user) {
+            dispatch(fetchTwoLastReadings({ userId: user.id, searchTerm }));
         }
-    }, [isDbReady, dispatch, searchTerm]);
+    }, [isDbReady, isAuthReady, user,  dispatch, searchTerm ]);
 
     if (loading) {
         return (

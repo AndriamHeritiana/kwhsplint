@@ -3,6 +3,7 @@ import { Reading } from '@/core/domain/entities/Reading';
 export function readingToPlainObject(reading: Reading) {
     return {
         id: reading.id,
+        userId: reading.userId,
         newInputDate: reading.newInputDate,
         oldInputDate: reading.oldInputDate,
         mainCounterValue: reading.mainCounterValue,

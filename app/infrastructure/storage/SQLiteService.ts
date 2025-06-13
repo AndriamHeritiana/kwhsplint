@@ -23,11 +23,12 @@ export class SQLiteService {
         if (!this.db) throw new Error('Base de données non initialisée');
         const query = `
             INSERT INTO readings (
-                newInputDate, oldInputDate, mainCounterValue, newSubMeterValue,
+                userId, newInputDate, oldInputDate, mainCounterValue, newSubMeterValue,
                 oldSubMeterValue, amountInvoice, amountToPay, residence, city
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
         `;
         const values = [
+            reading.userId,
             reading.newInputDate,
             reading.oldInputDate,
             reading.mainCounterValue,
@@ -40,15 +41,15 @@ export class SQLiteService {
         ];
         await this.db.executeSql(query, values);
     }
-    async getReadings(searchTerm?: string, limit?: number): Promise<Omit<Reading, keyof Reading & 'constructor'>[]> {
+    async getReadings(userId: string, searchTerm?: string, limit?: number ): Promise<Omit<Reading, keyof Reading & 'constructor'>[]> {
         if (!this.db) throw new Error('Database not initialized');
 
-        let query = `SELECT * FROM readings`;
-        let params: string[] = [];
+        let query = `SELECT * FROM readings WHERE userId = ?`;
+        let params: string[] = [userId];
 
         if (searchTerm) {
             const sanitizedSearchTerm = searchTerm.replace(/[^a-zA-Z0-9\s]/g, '');
-            query += ` WHERE residence LIKE ? OR city LIKE ? OR amountInvoice LIKE ?`;
+            query += ` AND (residence LIKE ? OR city LIKE ? OR amountInvoice LIKE ?)`;
             params = [`%${sanitizedSearchTerm}%`, `%${sanitizedSearchTerm}%`, `%${sanitizedSearchTerm}%`];
         }
 
@@ -65,6 +66,7 @@ export class SQLiteService {
             const row = results.rows.item(i);
             readings.push({
                 id: row.id,
+                userId: row.userId,
                 newInputDate: new Date(row.newInputDate).toISOString(),
                 oldInputDate: new Date(row.oldInputDate).toISOString(),
                 mainCounterValue: row.mainCounterValue,

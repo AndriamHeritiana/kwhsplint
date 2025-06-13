@@ -6,12 +6,14 @@ interface AuthState {
     user: User | null;
     loading: boolean;
     error: string | null;
+    isReady: boolean;
 }
 
 const initialState: AuthState = {
     user: null,
     loading: false,
     error: null,
+    isReady: false,
 };
 
 export const signIn = createAsyncThunk(
@@ -49,10 +51,12 @@ const authSlice = createSlice({
             .addCase(signIn.fulfilled, (state, action) => {
                 state.loading = false;
                 state.user = action.payload;
+                state.isReady = true;
             })
             .addCase(signIn.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.error.message || "Erreur de connexion";
+                state.isReady = true;
             })
             .addCase(signUp.pending, (state) => {
                 state.loading = true;
@@ -61,16 +65,27 @@ const authSlice = createSlice({
             .addCase(signUp.fulfilled, (state, action) => {
                 state.loading = false;
                 state.user = action.payload;
+                state.isReady = true;
             })
             .addCase(signUp.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.error.message || "Erreur d'inscription";
+                state.isReady = true;
             })
             .addCase(signOut.fulfilled, (state) => {
                 state.user = null;
+                state.isReady = true;
             })
             .addCase(getCurrentUser.fulfilled, (state, action) => {
                 state.user = action.payload;
+                state.loading = false;
+                state.isReady = true;
+            })
+            .addCase(getCurrentUser.rejected, (state, action) => {
+            state.user = null;
+            state.loading = false;
+            state.error = action.error.message || "Erreur lors de la récupération de l'utilisateur";
+            state.isReady = true;
             });
     },
 });
