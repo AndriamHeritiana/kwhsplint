@@ -11,37 +11,43 @@ import {
 import { Formik } from 'formik';
 import { Reading } from '@/core/domain/entities/Reading.ts';
 import { useSelector, useDispatch } from 'react-redux';
-import { addReading, initializeDatabase } from '@/presentation/state/redux/store/readingSlice';
+import { addReadingAndUpdateTotal, initializeDatabase } from '@/presentation/state/redux/store/readingSlice';
 import { RootState, AppDispatch } from '@/presentation/state/redux/store/store';
 import Toast from 'react-native-toast-message';
 import { readingToPlainObject } from '@/core/utils/readingToPlainObject';
 import { FormValues } from '@/core/domain/types/FormValues.ts';
 import { readingFormValidationSchema } from '@/presentation/screens/schema/validationSchema.ts';
+import { selectAuthIsReady, selectUser } from '@/presentation/state/redux/selectors/authSelectors.ts';
+import {fetchLatestReading} from "@/presentation/state/redux/store/readingSlice.ts";
 import FormContent from './FormContent';
-
+import { parseAddress } from '@/core/utils/addressUtils'
 const ReadingForm = () => {
     const dispatch = useDispatch<AppDispatch>();
-    const { loading, error, isDbReady } = useSelector((state: RootState) => state.reading);
+    const { loading, error, isDbReady, latestReading } = useSelector((state: RootState) => state.reading);
+    const user = useSelector(selectUser);
+    const isAuthReady = useSelector(selectAuthIsReady);
 
-    // Initial values of the form
-    const initialValues: FormValues = {
-        userId: '',
-        newInputDate: new Date(),
-        oldInputDate: new Date(),
-        mainCounterValue: '',
-        newSubMeterValue: '',
-        oldSubMeterValue: '',
-        amountInvoice: '',
-        amountToPay: '0.00',
-        residence: '',
-        city: '',
-    };
-
-    // Initialize the database on component mount
+    // Initialize the database and fetch latest reading on component mount
     useEffect(() => {
         dispatch(initializeDatabase());
-    }, [dispatch]);
-
+        if (isAuthReady && user && !latestReading) {
+            dispatch(fetchLatestReading(user.id));
+        }
+    }, [dispatch, isAuthReady, user, latestReading]);
+    const { residence, city } = parseAddress(user?.address);
+    // Initial values of the form
+    const initialValues: FormValues = {
+        userId: user?.id || '',
+        newInputDate: new Date(),
+        oldInputDate: latestReading ? new Date(latestReading.newInputDate) : new Date(),
+        mainCounterValue: '',
+        newSubMeterValue: '',
+        oldSubMeterValue: latestReading ? latestReading.newSubMeterValue.toString() : '',
+        amountInvoice: '',
+        amountToPay: '0.00',
+        residence: residence,
+        city: city,
+    };
     const handleSubmit = async (values: FormValues, { resetForm, setSubmitting }: { resetForm: () => void; setSubmitting: (isSubmitting: boolean) => void }) => {
         try {
             const reading = new Reading({
@@ -58,7 +64,7 @@ const ReadingForm = () => {
                 city: values.city,
             });
             const readingToPlainO = readingToPlainObject(reading);
-            await dispatch(addReading(readingToPlainO)).unwrap();
+            await dispatch(addReadingAndUpdateTotal(readingToPlainO)).unwrap();
             Toast.show({
                 type: 'success',
                 text1: 'Success',
@@ -107,6 +113,7 @@ const ReadingForm = () => {
                     <Text style={styles.subtitle}>Please fill all the required fields</Text>
                 </View>
                 <Formik
+                    key={user?.id || 'no-user'}
                     initialValues={initialValues}
                     validationSchema={readingFormValidationSchema}
                     onSubmit={handleSubmit}

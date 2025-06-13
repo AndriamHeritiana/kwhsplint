@@ -4,18 +4,15 @@ import { useFormikContext } from 'formik';
 import { CalculateAmountToPayUseCase } from '@/core/domain/usecases/CalculateAmountToPayUseCase';
 import { useCalculateAmountToPay } from '@/presentation/hooks/useCalculateAmountToPay';
 import { FormValues } from '@/core/domain/types/FormValues.ts';
-import { useSelector } from 'react-redux';
-import { selectAuthIsReady, selectUser } from '@/presentation/state/redux/selectors/authSelectors.ts';
 import FormInput from '@/presentation/components/ui/FormInput.tsx';
 import DateFormInput from '@/presentation/components/ui/DateFormInput.tsx';
+import { RootState } from '@/presentation/state/redux/store/store.ts';
 
 const FormContent = () => {
     const { values, errors, touched, setFieldValue, submitForm, isSubmitting } = useFormikContext<FormValues>();
     const calculateAmountToPayUseCase = useMemo(() => new CalculateAmountToPayUseCase(), []);
     const [showPicker, setShowPicker] = useState(false);
     const [showOldPicker, setShowOldPicker] = useState(false);
-    const user = useSelector(selectUser);
-    const isAuthReady = useSelector(selectAuthIsReady);
 
     // Calculate amount to pay with the personalized hook
     const amountToPay = useCalculateAmountToPay(values, errors, calculateAmountToPayUseCase);
@@ -24,13 +21,6 @@ const FormContent = () => {
     useEffect(() => {
         setFieldValue('amountToPay', amountToPay);
     }, [amountToPay, setFieldValue]);
-
-    // Update userId in the form when the user is available
-    useEffect(() => {
-        if (user?.id && isAuthReady) {
-            setFieldValue('userId', user.id.toString());
-        }
-    }, [user?.id, isAuthReady, setFieldValue]);
 
     return (
         <View style={styles.formContainer}>
@@ -118,6 +108,7 @@ const FormContent = () => {
                     keyboardType="default"
                     autoCapitalize="words"
                     error={(touched.residence || isSubmitting) ? errors.residence : undefined}
+                    editable={false}
                 />
             </View>
             {/* City Section */}
@@ -130,6 +121,7 @@ const FormContent = () => {
                     keyboardType="default"
                     autoCapitalize="words"
                     error={(touched.city || isSubmitting) ? errors.city : undefined}
+                    editable={false}
                 />
             </View>
             {/* Amount you have to pay Section */}
