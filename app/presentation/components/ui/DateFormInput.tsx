@@ -83,12 +83,12 @@ const DateFormInput = forwardRef<never, DateFormInputProps>(({
 
     const labelColor = animatedLabelPosition.interpolate({
         inputRange: [0, 1],
-        outputRange: [colors.neutral[500], colors.primary[600]],
+        outputRange: [colors.neutral[500], colors.primary[70]],
     });
 
     const borderColor = animatedBorderColor.interpolate({
         inputRange: [0, 1],
-        outputRange: [error ? colors.error[500] : colors.neutral[300], error ? colors.error[500] : colors.primary[500]],
+        outputRange: [error ? colors.error[500] : colors.neutral[300], error ? colors.error[500] : colors.primary[70]],
     });
 
     return (

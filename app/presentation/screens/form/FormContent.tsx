@@ -51,6 +51,7 @@ const FormContent = () => {
                         placeholder="0.00"
                         keyboardType="decimal-pad"
                         error={(touched.oldSubMeterValue || isSubmitting) ? errors.oldSubMeterValue : undefined}
+                        iconName="fax"
                     />
                 </View>
             </View>
@@ -67,12 +68,13 @@ const FormContent = () => {
                 </View>
                 <View style={styles.inputGroup}>
                     <FormInput
-                        label="Sub-meter value"
+                        label="Sub-meter"
                         value={values.newSubMeterValue}
                         onChangeText={(text) => setFieldValue('newSubMeterValue', text)}
                         placeholder="0.00"
                         keyboardType="decimal-pad"
                         error={(touched.newSubMeterValue || isSubmitting) ? errors.newSubMeterValue : undefined}
+                        iconName="fax"
                     />
                 </View>
             </View>
@@ -85,6 +87,7 @@ const FormContent = () => {
                     placeholder="0.00"
                     keyboardType="decimal-pad"
                     error={(touched.mainCounterValue || isSubmitting) ? errors.mainCounterValue : undefined}
+                    iconName="fax"
                 />
             </View>
             {/* Amount in invoice Section */}
@@ -96,6 +99,7 @@ const FormContent = () => {
                     placeholder="0.00"
                     keyboardType="decimal-pad"
                     error={(touched.amountInvoice || isSubmitting) ? errors.amountInvoice : undefined}
+                    iconName="dollar"
                 />
             </View>
             {/* Residence Section */}
@@ -109,6 +113,7 @@ const FormContent = () => {
                     autoCapitalize="words"
                     error={(touched.residence || isSubmitting) ? errors.residence : undefined}
                     editable={false}
+                    iconName="building"
                 />
             </View>
             {/* City Section */}
@@ -122,6 +127,7 @@ const FormContent = () => {
                     autoCapitalize="words"
                     error={(touched.city || isSubmitting) ? errors.city : undefined}
                     editable={false}
+                    iconName="building"
                 />
             </View>
             {/* Amount you have to pay Section */}
