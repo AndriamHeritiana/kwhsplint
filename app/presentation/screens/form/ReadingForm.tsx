@@ -17,31 +17,36 @@ import Toast from 'react-native-toast-message';
 import { readingToPlainObject } from '@/core/utils/readingToPlainObject';
 import { FormValues } from '@/core/domain/types/FormValues.ts';
 import { readingFormValidationSchema } from '@/presentation/screens/schema/validationSchema.ts';
+import { selectAuthIsReady, selectUser } from '@/presentation/state/redux/selectors/authSelectors.ts';
+import {fetchLatestReading} from "@/presentation/state/redux/store/readingSlice.ts";
 import FormContent from './FormContent';
 
 const ReadingForm = () => {
     const dispatch = useDispatch<AppDispatch>();
-    const { loading, error, isDbReady } = useSelector((state: RootState) => state.reading);
+    const { loading, error, isDbReady, latestReading } = useSelector((state: RootState) => state.reading);
+    const user = useSelector(selectUser);
+    const isAuthReady = useSelector(selectAuthIsReady);
 
+    // Initialize the database and fetch latest reading on component mount
+    useEffect(() => {
+        dispatch(initializeDatabase());
+        if (isAuthReady && user && !latestReading) {
+            dispatch(fetchLatestReading(user.id));
+        }
+    }, [dispatch, isAuthReady, user, latestReading]);
     // Initial values of the form
     const initialValues: FormValues = {
-        userId: '',
+        userId: user?.id || '',
         newInputDate: new Date(),
-        oldInputDate: new Date(),
+        oldInputDate: latestReading ? new Date(latestReading.newInputDate) : new Date(),
         mainCounterValue: '',
         newSubMeterValue: '',
-        oldSubMeterValue: '',
+        oldSubMeterValue: latestReading ? latestReading.newSubMeterValue.toString() : '',
         amountInvoice: '',
         amountToPay: '0.00',
         residence: '',
         city: '',
     };
-
-    // Initialize the database on component mount
-    useEffect(() => {
-        dispatch(initializeDatabase());
-    }, [dispatch]);
-
     const handleSubmit = async (values: FormValues, { resetForm, setSubmitting }: { resetForm: () => void; setSubmitting: (isSubmitting: boolean) => void }) => {
         try {
             const reading = new Reading({
@@ -107,6 +112,7 @@ const ReadingForm = () => {
                     <Text style={styles.subtitle}>Please fill all the required fields</Text>
                 </View>
                 <Formik
+                    key={user?.id || 'no-user'}
                     initialValues={initialValues}
                     validationSchema={readingFormValidationSchema}
                     onSubmit={handleSubmit}

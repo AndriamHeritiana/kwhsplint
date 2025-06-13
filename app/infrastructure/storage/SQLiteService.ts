@@ -92,6 +92,33 @@ export class SQLiteService {
         }
         return 0.0;
     }
+    /**
+     * Récupère la dernière valeur de newInputDate et newSubMeterValue pour un utilisateur donné, basée sur l'ID.
+     * @param userId L'identifiant de l'utilisateur
+     * @returns Un objet contenant newInputDate et newSubMeterValue, ou null si aucune lecture n'existe
+     */
+    async getLatestMeterAndDateReading(userId: string): Promise<{ newInputDate: string; newSubMeterValue: number } | null> {
+        if (!this.db) throw new Error('Database not initialized');
+
+        const query = `
+            SELECT newInputDate, newSubMeterValue
+            FROM readings
+            WHERE userId = ?
+            ORDER BY newInputDate DESC
+                LIMIT 1;
+    `;
+        const params = [userId];
+        const [results] = await this.db.executeSql(query, params);
+        if (results.rows.length > 0) {
+            const row = results.rows.item(0);
+            console.log('Row:', row);
+            return {
+                newInputDate: new Date(row.newInputDate).toISOString(),
+                newSubMeterValue: row.newSubMeterValue,
+            };
+        }
+        return null;
+    }
     async closeDatabase(): Promise<void> {
         if (this.db) {
             await this.db.close();

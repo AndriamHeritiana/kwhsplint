@@ -6,6 +6,7 @@ import { GetHistoryUseCase } from '@/core/domain/usecases/GetHistoryUseCase.ts';
 import { AddReadingUseCase } from '@/core/domain/usecases/AddReadingUseCase.ts';
 import { GetTwoLastHistoryUseCase } from '@/core/domain/usecases/GetTwoLastHistoryUseCase';
 import { GetAmountToPayUseCase } from '@/core/domain/usecases/user/GetAmountToPayUseCase.ts';
+import { GetLatestMeterAndDateReadingUseCase } from '@/core/domain/usecases/reading/GetLatestMeterAndDateReading.ts';
 
 // Initialisation des services
 const sqliteService = new SQLiteService();
@@ -14,12 +15,14 @@ const getHistoryUseCase = new GetHistoryUseCase(readingRepository);
 const getTwoLastHistoryUseCase = new GetTwoLastHistoryUseCase(readingRepository);
 const addReadingUseCase = new AddReadingUseCase(readingRepository);
 const getAmountToPayUseCase = new GetAmountToPayUseCase(readingRepository);
+const getLatestMeterAndDateReadingUseCase = new GetLatestMeterAndDateReadingUseCase(readingRepository);
 
 // État initial
 interface ReadingState {
     homeReadings: Reading[];
     historyReadings: Reading[];
     totalAmountToPay: number;
+    latestReading: { newInputDate: string; newSubMeterValue: number } | null;
     loading: boolean;
     error: string | null;
     isDbReady: boolean;
@@ -29,6 +32,7 @@ const initialState: ReadingState = {
     homeReadings: [],
     historyReadings: [],
     totalAmountToPay: 0.0,
+    latestReading: null,
     loading: false,
     error: null,
     isDbReady: false,
@@ -61,6 +65,7 @@ export const addReadingAndUpdateTotal = createAsyncThunk(
     async (reading: Reading, { dispatch }) => {
         await addReadingUseCase.execute(reading);
         const totalAmount = await getAmountToPayUseCase.execute(reading.userId);
+        // await dispatch(fetchLatestReading(reading.userId)); // Déclenche la mise à jour de latestReading
         return { reading, totalAmount };
     }
 );
@@ -70,6 +75,14 @@ export const fetchAmountToPay = createAsyncThunk(
     'reading/fetchAmountToPay',
     async (userId: string) => {
         return await getAmountToPayUseCase.execute(userId);
+    }
+);
+
+// Thunk pour récupérer la dernière lecture (newInputDate et newSubMeterValue)
+export const fetchLatestReading = createAsyncThunk(
+    'reading/fetchLatestReading',
+    async (userId: string) => {
+        return await getLatestMeterAndDateReadingUseCase.execute(userId);
     }
 );
 
@@ -124,7 +137,11 @@ const readingSlice = createSlice({
                 const { reading, totalAmount } = action.payload;
                 state.historyReadings = [reading, ...state.historyReadings];
                 state.homeReadings = [reading, ...state.homeReadings];
-                state.totalAmountToPay = totalAmount; // Mise à jour de la somme totale
+                state.totalAmountToPay = totalAmount;
+                state.latestReading = {
+                    newInputDate: reading.newInputDate,
+                    newSubMeterValue: reading.newSubMeterValue,
+                };
                 state.loading = false;
             })
             .addCase(addReadingAndUpdateTotal.rejected, (state, action) => {
@@ -141,6 +158,17 @@ const readingSlice = createSlice({
             .addCase(fetchAmountToPay.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.error.message || "Erreur lors de la récupération du montant total";
+            })
+            .addCase(fetchLatestReading.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(fetchLatestReading.fulfilled, (state, action) => {
+                state.latestReading = action.payload;
+                state.loading = false;
+            })
+            .addCase(fetchLatestReading.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message || "Erreur lors de la récupération de la dernière lecture";
             });
     },
 });

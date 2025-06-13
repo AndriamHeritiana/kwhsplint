@@ -4,4 +4,5 @@ export interface ReadingRepository {
     getAll(userId: string, searchTerm?: string): Promise<Reading[]>;
     getTwoLastReadings(userId: string, searchTerm?: string): Promise<Reading[]>;
     getTotalAmountToPay(userId: string): Promise<number>;
+    getLatestMeterAndDateReading(userId: string): Promise<{ newInputDate: string; newSubMeterValue: number } | null>;
 }

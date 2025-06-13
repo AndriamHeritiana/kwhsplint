@@ -22,4 +22,7 @@ export class ReadingRepositoryImpl implements ReadingRepository {
     async getTotalAmountToPay(userId: string): Promise<number> {
         return await this.sqliteService.getTotalAmountToPay(userId);
     }
+    async getLatestMeterAndDateReading(userId: string): Promise<{ newInputDate: string; newSubMeterValue: number } | null> {
+        return await this.sqliteService.getLatestMeterAndDateReading(userId);
+    }
 }
