@@ -19,4 +19,7 @@ export class ReadingRepositoryImpl implements ReadingRepository {
     async getTwoLastReadings(userId: string, searchTerm?: string): Promise<Reading[]> {
         return await this.sqliteService.getReadings(userId, searchTerm, 2);
     }
+    async getTotalAmountToPay(userId: string): Promise<number> {
+        return await this.sqliteService.getTotalAmountToPay(userId);
+    }
 }

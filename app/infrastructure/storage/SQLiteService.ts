@@ -81,6 +81,17 @@ export class SQLiteService {
 
         return readings;
     }
+    async getTotalAmountToPay(userId: string): Promise<number> {
+        if (!this.db) throw new Error('Database not initialized');
+        const query = `SELECT SUM(amountToPay) as total FROM readings WHERE userId = ?`;
+        const params = [userId];
+        const [results] = await this.db.executeSql(query, params);
+        if (results.rows.length > 0) {
+            const total = results.rows.item(0).total;
+            return total !== null && typeof total === 'number' ? total : 0.0;
+        }
+        return 0.0;
+    }
     async closeDatabase(): Promise<void> {
         if (this.db) {
             await this.db.close();

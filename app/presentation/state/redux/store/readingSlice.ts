@@ -4,7 +4,8 @@ import { SQLiteService } from '@/infrastructure/storage/SQLiteService.ts';
 import { ReadingRepositoryImpl } from '@/core/data/repositories/ReadingRepositoryImpl.ts';
 import { GetHistoryUseCase } from '@/core/domain/usecases/GetHistoryUseCase.ts';
 import { AddReadingUseCase } from '@/core/domain/usecases/AddReadingUseCase.ts';
-import {GetTwoLastHistoryUseCase} from '@/core/domain/usecases/GetTwoLastHistoryUseCase';
+import { GetTwoLastHistoryUseCase } from '@/core/domain/usecases/GetTwoLastHistoryUseCase';
+import { GetAmountToPayUseCase } from '@/core/domain/usecases/user/GetAmountToPayUseCase.ts';
 
 // Initialisation des services
 const sqliteService = new SQLiteService();
@@ -12,11 +13,13 @@ const readingRepository = new ReadingRepositoryImpl(sqliteService);
 const getHistoryUseCase = new GetHistoryUseCase(readingRepository);
 const getTwoLastHistoryUseCase = new GetTwoLastHistoryUseCase(readingRepository);
 const addReadingUseCase = new AddReadingUseCase(readingRepository);
+const getAmountToPayUseCase = new GetAmountToPayUseCase(readingRepository);
 
 // État initial
 interface ReadingState {
-    homeReadings: Reading[]; // Pour HomeScreen (2 dernières lectures)
-    historyReadings: Reading[]; // Pour HistoryScreen (toutes les lectures)
+    homeReadings: Reading[];
+    historyReadings: Reading[];
+    totalAmountToPay: number;
     loading: boolean;
     error: string | null;
     isDbReady: boolean;
@@ -25,6 +28,7 @@ interface ReadingState {
 const initialState: ReadingState = {
     homeReadings: [],
     historyReadings: [],
+    totalAmountToPay: 0.0,
     loading: false,
     error: null,
     isDbReady: false,
@@ -47,13 +51,27 @@ export const fetchReadings = createAsyncThunk(
 export const fetchTwoLastReadings = createAsyncThunk(
     'reading/fetchTwoLastReadings',
     async ({ userId, searchTerm }: { userId: string; searchTerm?: string }) => {
-    return await getTwoLastHistoryUseCase.execute(userId, searchTerm);
-});
-// Thunk pour ajouter une lecture
-export const addReading = createAsyncThunk('reading/addReading', async (reading: Reading) => {
-    await addReadingUseCase.execute(reading);
-    return reading; // Retourne uniquement la nouvelle lecture ajoutée
-});
+        return await getTwoLastHistoryUseCase.execute(userId, searchTerm);
+    }
+);
+
+// Thunk pour ajouter une lecture et mettre à jour la somme totale
+export const addReadingAndUpdateTotal = createAsyncThunk(
+    'reading/addReadingAndUpdateTotal',
+    async (reading: Reading, { dispatch }) => {
+        await addReadingUseCase.execute(reading);
+        const totalAmount = await getAmountToPayUseCase.execute(reading.userId);
+        return { reading, totalAmount };
+    }
+);
+
+// Thunk pour récupérer la somme totale à payer
+export const fetchAmountToPay = createAsyncThunk(
+    'reading/fetchAmountToPay',
+    async (userId: string) => {
+        return await getAmountToPayUseCase.execute(userId);
+    }
+);
 
 // Slice Redux
 const readingSlice = createSlice({
@@ -75,7 +93,7 @@ const readingSlice = createSlice({
             })
             .addCase(initializeDatabase.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.error.message || 'Erreur lors de l\'initialisation de la base de données';
+                state.error = action.error.message || "Erreur lors de l'initialisation de la base de données";
             })
             .addCase(fetchReadings.pending, (state) => {
                 state.loading = true;
@@ -99,17 +117,30 @@ const readingSlice = createSlice({
                 state.loading = false;
                 state.error = action.error.message || 'Erreur lors de la récupération des lectures';
             })
-            .addCase(addReading.pending, (state) => {
+            .addCase(addReadingAndUpdateTotal.pending, (state) => {
                 state.loading = true;
             })
-            .addCase(addReading.fulfilled, (state, action) => {
-                state.historyReadings = [action.payload, ...state.historyReadings]; // Ajoute la nouvelle lecture en tête de liste
-                state.homeReadings = [action.payload, ...state.homeReadings]; // Ajoute la nouvelle lecture en tête de liste
+            .addCase(addReadingAndUpdateTotal.fulfilled, (state, action) => {
+                const { reading, totalAmount } = action.payload;
+                state.historyReadings = [reading, ...state.historyReadings];
+                state.homeReadings = [reading, ...state.homeReadings];
+                state.totalAmountToPay = totalAmount; // Mise à jour de la somme totale
                 state.loading = false;
             })
-            .addCase(addReading.rejected, (state, action) => {
+            .addCase(addReadingAndUpdateTotal.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.error.message || 'Erreur lors de l\'ajout de la lecture';
+                state.error = action.error.message || "Erreur lors de l'ajout de la lecture ou de la mise à jour du montant";
+            })
+            .addCase(fetchAmountToPay.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(fetchAmountToPay.fulfilled, (state, action) => {
+                state.totalAmountToPay = action.payload;
+                state.loading = false;
+            })
+            .addCase(fetchAmountToPay.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message || "Erreur lors de la récupération du montant total";
             });
     },
 });

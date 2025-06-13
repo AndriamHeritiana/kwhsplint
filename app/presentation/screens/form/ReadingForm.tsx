@@ -11,7 +11,7 @@ import {
 import { Formik } from 'formik';
 import { Reading } from '@/core/domain/entities/Reading.ts';
 import { useSelector, useDispatch } from 'react-redux';
-import { addReading, initializeDatabase } from '@/presentation/state/redux/store/readingSlice';
+import { addReadingAndUpdateTotal, initializeDatabase } from '@/presentation/state/redux/store/readingSlice';
 import { RootState, AppDispatch } from '@/presentation/state/redux/store/store';
 import Toast from 'react-native-toast-message';
 import { readingToPlainObject } from '@/core/utils/readingToPlainObject';
@@ -58,7 +58,7 @@ const ReadingForm = () => {
                 city: values.city,
             });
             const readingToPlainO = readingToPlainObject(reading);
-            await dispatch(addReading(readingToPlainO)).unwrap();
+            await dispatch(addReadingAndUpdateTotal(readingToPlainO)).unwrap();
             Toast.show({
                 type: 'success',
                 text1: 'Success',
