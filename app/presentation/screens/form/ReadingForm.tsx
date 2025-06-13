@@ -20,7 +20,7 @@ import { readingFormValidationSchema } from '@/presentation/screens/schema/valid
 import { selectAuthIsReady, selectUser } from '@/presentation/state/redux/selectors/authSelectors.ts';
 import {fetchLatestReading} from "@/presentation/state/redux/store/readingSlice.ts";
 import FormContent from './FormContent';
-
+import { parseAddress } from '@/core/utils/addressUtils'
 const ReadingForm = () => {
     const dispatch = useDispatch<AppDispatch>();
     const { loading, error, isDbReady, latestReading } = useSelector((state: RootState) => state.reading);
@@ -34,6 +34,7 @@ const ReadingForm = () => {
             dispatch(fetchLatestReading(user.id));
         }
     }, [dispatch, isAuthReady, user, latestReading]);
+    const { residence, city } = parseAddress(user?.address);
     // Initial values of the form
     const initialValues: FormValues = {
         userId: user?.id || '',
@@ -44,8 +45,8 @@ const ReadingForm = () => {
         oldSubMeterValue: latestReading ? latestReading.newSubMeterValue.toString() : '',
         amountInvoice: '',
         amountToPay: '0.00',
-        residence: '',
-        city: '',
+        residence: residence,
+        city: city,
     };
     const handleSubmit = async (values: FormValues, { resetForm, setSubmitting }: { resetForm: () => void; setSubmitting: (isSubmitting: boolean) => void }) => {
         try {

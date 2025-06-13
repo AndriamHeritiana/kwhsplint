@@ -108,6 +108,7 @@ const FormContent = () => {
                     keyboardType="default"
                     autoCapitalize="words"
                     error={(touched.residence || isSubmitting) ? errors.residence : undefined}
+                    editable={false}
                 />
             </View>
             {/* City Section */}
@@ -120,6 +121,7 @@ const FormContent = () => {
                     keyboardType="default"
                     autoCapitalize="words"
                     error={(touched.city || isSubmitting) ? errors.city : undefined}
+                    editable={false}
                 />
             </View>
             {/* Amount you have to pay Section */}
