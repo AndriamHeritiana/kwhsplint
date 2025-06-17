@@ -8,7 +8,7 @@ import {
     Animated,
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import Icon from 'react-native-vector-icons/FontAwesome5'; // Updated to FontAwesome5 for 'calendar-alt'
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import { colors } from '@/state/context/styles/colors.ts';
 
 interface DateFormInputProps {
@@ -173,10 +173,10 @@ DateFormInput.displayName = 'DateFormInput';
 
 const styles = StyleSheet.create({
     container: {
-        marginBottom: 24,
+        marginBottom: 6,
     },
     inputContainer: {
-        height: 56,
+        height: 50,
         borderRadius: 8,
         flexDirection: 'row',
         alignItems: 'center',

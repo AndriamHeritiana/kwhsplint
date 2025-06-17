@@ -6,7 +6,7 @@ import { useCalculateAmountToPay } from '@/presentation/hooks/useCalculateAmount
 import { FormValues } from '@/core/domain/types/FormValues.ts';
 import FormInput from '@/presentation/components/ui/FormInput.tsx';
 import DateFormInput from '@/presentation/components/ui/DateFormInput.tsx';
-import { RootState } from '@/presentation/state/redux/store/store.ts';
+import CameraButton from '@/presentation/components/ui/CameraButton.tsx';
 
 const FormContent = () => {
     const { values, errors, touched, setFieldValue, submitForm, isSubmitting } = useFormikContext<FormValues>();
@@ -32,65 +32,74 @@ const FormContent = () => {
                 editable={false}
             />
             {/* Date Sections */}
+            <View style={styles.section}>
+                <DateFormInput
+                    label="Old statement"
+                    value={values.oldInputDate}
+                    onChange={(date) => setFieldValue('oldInputDate', date)}
+                    error={(touched.oldInputDate || isSubmitting) ? errors.oldInputDate as string : undefined}
+                    onFocus={() => setShowOldPicker(true)}
+                    onBlur={() => setShowOldPicker(false)}
+                    iconName="calendar-month"
+                />
+            </View>
             <View style={styles.rowSection}>
                 <View style={styles.inputGroup}>
-                    <DateFormInput
-                        label="Old statement"
-                        value={values.oldInputDate}
-                        onChange={(date) => setFieldValue('oldInputDate', date)}
-                        error={(touched.oldInputDate || isSubmitting) ? errors.oldInputDate as string : undefined}
-                        onFocus={() => setShowOldPicker(true)}
-                        onBlur={() => setShowOldPicker(false)}
-                        iconName="calendar"
-                    />
-                </View>
-                <View style={styles.inputGroup}>
                     <FormInput
-                        label="Sub-meter value"
+                        label="Old sub-meter"
                         value={values.oldSubMeterValue}
                         onChangeText={(text) => setFieldValue('oldSubMeterValue', text)}
                         placeholder="0.00"
                         keyboardType="decimal-pad"
                         error={(touched.oldSubMeterValue || isSubmitting) ? errors.oldSubMeterValue : undefined}
-                        iconName="fax"
+                        iconName="electric-meter"
                     />
                 </View>
+                <CameraButton
+                    label="Scan old meter"
+                />
+            </View>
+            <View style={styles.section}>
+                <DateFormInput
+                    label="New statement"
+                    value={values.newInputDate}
+                    onChange={(date) => setFieldValue('newInputDate', date)}
+                    error={(touched.newInputDate || isSubmitting) ? errors.newInputDate as string : undefined}
+                    onFocus={() => setShowPicker(true)}
+                    onBlur={() => setShowPicker(false)}
+                    iconName="calendar-month"
+                />
             </View>
             <View style={styles.rowSection}>
                 <View style={styles.inputGroup}>
-                    <DateFormInput
-                        label="New statement"
-                        value={values.newInputDate}
-                        onChange={(date) => setFieldValue('newInputDate', date)}
-                        error={(touched.newInputDate || isSubmitting) ? errors.newInputDate as string : undefined}
-                        onFocus={() => setShowPicker(true)}
-                        onBlur={() => setShowPicker(false)}
-                        iconName="calendar"
-                    />
-                </View>
-                <View style={styles.inputGroup}>
                     <FormInput
-                        label="Sub-meter"
+                        label="New sub-meter"
                         value={values.newSubMeterValue}
                         onChangeText={(text) => setFieldValue('newSubMeterValue', text)}
                         placeholder="0.00"
                         keyboardType="decimal-pad"
                         error={(touched.newSubMeterValue || isSubmitting) ? errors.newSubMeterValue : undefined}
-                        iconName="fax"
+                        iconName="electric-meter"
                     />
                 </View>
+                <CameraButton
+                    label="Scan new meter"
+                />
             </View>
             {/* Meter Values Row */}
-            <View style={styles.section}>
-                <FormInput
-                    label="Main meter value"
-                    value={values.mainCounterValue}
-                    onChangeText={(text) => setFieldValue('mainCounterValue', text)}
-                    placeholder="0.00"
-                    keyboardType="decimal-pad"
-                    error={(touched.mainCounterValue || isSubmitting) ? errors.mainCounterValue : undefined}
-                    iconName="fax"
-                />
+            <View style={styles.rowSection}>
+                <View style={styles.inputGroup}>
+                    <FormInput
+                        label="Main meter"
+                        value={values.mainCounterValue}
+                        onChangeText={(text) => setFieldValue('mainCounterValue', text)}
+                        placeholder="0.00"
+                        keyboardType="decimal-pad"
+                        error={(touched.mainCounterValue || isSubmitting) ? errors.mainCounterValue : undefined}
+                        iconName="electric-meter"
+                    />
+                </View>
+                <CameraButton label="Scan main meter" />
             </View>
             {/* Amount in invoice Section */}
             <View style={styles.section}>
@@ -101,7 +110,7 @@ const FormContent = () => {
                     placeholder="0.00"
                     keyboardType="decimal-pad"
                     error={(touched.amountInvoice || isSubmitting) ? errors.amountInvoice : undefined}
-                    iconName="dollar"
+                    iconName="money"
                 />
             </View>
             {/* Residence Section */}
@@ -115,7 +124,7 @@ const FormContent = () => {
                     autoCapitalize="words"
                     error={(touched.residence || isSubmitting) ? errors.residence : undefined}
                     editable={false}
-                    iconName="building"
+                    iconName="home"
                 />
             </View>
             {/* City Section */}
@@ -129,7 +138,7 @@ const FormContent = () => {
                     autoCapitalize="words"
                     error={(touched.city || isSubmitting) ? errors.city : undefined}
                     editable={false}
-                    iconName="building"
+                    iconName="location-city"
                 />
             </View>
             {/* Amount you have to pay Section */}
@@ -142,6 +151,7 @@ const FormContent = () => {
                     keyboardType="decimal-pad"
                     error={undefined} // No error for read-only field
                     editable={false}
+                    iconName="money"
                 />
             </View>
             {/* Submit Button */}

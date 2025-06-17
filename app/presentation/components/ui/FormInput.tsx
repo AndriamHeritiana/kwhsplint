@@ -9,7 +9,7 @@ import {
     TouchableWithoutFeedback,
     KeyboardTypeOptions
 } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import { colors } from "@/state/context/styles/colors.ts";
 
 interface FormInputProps {
@@ -202,10 +202,10 @@ FormInput.displayName = 'FormInput';
 
 const styles = StyleSheet.create({
     container: {
-        marginBottom: 24,
+        marginBottom: 6,
     },
     inputContainer: {
-        height: 56,
+        height: 50,
         borderRadius: 8,
         flexDirection: 'row',
         alignItems: 'center',
@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
     label: {
         position: 'absolute',
         zIndex: 1,
-        fontWeight: '500',
+        fontWeight: '400',
     },
     input: {
         flex: 1,
