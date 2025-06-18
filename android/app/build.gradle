@@ -58,6 +58,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics'
     implementation 'com.google.firebase:firebase-auth'
     implementation project(':react-native-maps')
+    implementation 'com.google.mlkit:text-recognition:16.0.0'
 
     if (hermesEnabled.toBoolean()) {
         implementation "com.facebook.react:hermes-android"

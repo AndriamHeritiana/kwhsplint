@@ -22,6 +22,15 @@ const FormContent = () => {
         setFieldValue('amountToPay', amountToPay);
     }, [amountToPay, setFieldValue]);
 
+    // Fonction pour gérer le texte reconnu depuis CameraButton
+    const handleTextRecognized = (field: keyof FormValues) => (text: string) => {
+        // Nettoyer le texte (par exemple, extraire uniquement les chiffres décimaux)
+        const cleanedText = text.match(/^\d*\.?\d*$/) ? text : '';
+        if (cleanedText) {
+            setFieldValue(field, cleanedText);
+        }
+    };
+
     return (
         <View style={styles.formContainer}>
             {/* Hidden input for userId */}
@@ -32,18 +41,18 @@ const FormContent = () => {
                 editable={false}
             />
             {/* Date Sections */}
-            <View style={styles.section}>
-                <DateFormInput
-                    label="Old statement"
-                    value={values.oldInputDate}
-                    onChange={(date) => setFieldValue('oldInputDate', date)}
-                    error={(touched.oldInputDate || isSubmitting) ? errors.oldInputDate as string : undefined}
-                    onFocus={() => setShowOldPicker(true)}
-                    onBlur={() => setShowOldPicker(false)}
-                    iconName="calendar-month"
-                />
-            </View>
             <View style={styles.rowSection}>
+                <View style={styles.inputGroup}>
+                    <DateFormInput
+                        label="Old statement"
+                        value={values.oldInputDate}
+                        onChange={(date) => setFieldValue('oldInputDate', date)}
+                        error={(touched.oldInputDate || isSubmitting) ? errors.oldInputDate as string : undefined}
+                        onFocus={() => setShowOldPicker(true)}
+                        onBlur={() => setShowOldPicker(false)}
+                        iconName="calendar-month"
+                    />
+                </View>
                 <View style={styles.inputGroup}>
                     <FormInput
                         label="Old sub-meter"
@@ -55,9 +64,6 @@ const FormContent = () => {
                         iconName="electric-meter"
                     />
                 </View>
-                <CameraButton
-                    label="Scan old meter"
-                />
             </View>
             <View style={styles.section}>
                 <DateFormInput
@@ -84,6 +90,7 @@ const FormContent = () => {
                 </View>
                 <CameraButton
                     label="Scan new meter"
+                    onTextRecognized={handleTextRecognized('newSubMeterValue')}
                 />
             </View>
             {/* Meter Values Row */}
@@ -99,7 +106,10 @@ const FormContent = () => {
                         iconName="electric-meter"
                     />
                 </View>
-                <CameraButton label="Scan main meter" />
+                <CameraButton
+                    label="Scan main meter"
+                    onTextRecognized={handleTextRecognized('mainCounterValue')}
+                />
             </View>
             {/* Amount in invoice Section */}
             <View style={styles.section}>

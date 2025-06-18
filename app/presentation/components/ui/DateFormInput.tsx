@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
     },
     inputText: {
         flex: 1,
-        fontSize: 16,
+        fontSize: 12,
         color: colors.neutral[800],
         paddingVertical: 8,
     },
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
     },
     errorText: {
         marginTop: 4,
-        fontSize: 12,
+        fontSize: 11,
         color: colors.error[500],
         paddingLeft: 4,
     },

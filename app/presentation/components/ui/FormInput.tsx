@@ -107,7 +107,7 @@ const FormInput = forwardRef<TextInput, FormInputProps>(({
 
     const labelSize = animatedLabelPosition.interpolate({
         inputRange: [0, 1],
-        outputRange: [16, 12],
+        outputRange: [12, 10],
     });
 
     const labelColor = animatedLabelPosition.interpolate({
@@ -232,7 +232,7 @@ const styles = StyleSheet.create({
     input: {
         flex: 1,
         height: '100%',
-        fontSize: 16,
+        fontSize: 12,
         color: colors.neutral[800],
         paddingVertical: 8,
     },
