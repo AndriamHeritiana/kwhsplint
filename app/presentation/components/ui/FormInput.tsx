@@ -182,9 +182,9 @@ const FormInput = forwardRef<TextInput, FormInputProps>(({
                             <TouchableWithoutFeedback onPress={() => setHidePassword(!hidePassword)}>
                                 <View style={styles.iconContainer}>
                                     {hidePassword ? (
-                                        <Icon name="eye-slash" size={20} color={colors.neutral[500]} />
+                                        <Icon name="lock" size={20} color={colors.neutral[500]} />
                                     ) : (
-                                        <Icon name="eye" size={20} color={colors.neutral[500]} />
+                                        <Icon name="lock-open" size={20} color={colors.neutral[500]} />
                                     )}
                                 </View>
                             </TouchableWithoutFeedback>

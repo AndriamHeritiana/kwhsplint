@@ -12,6 +12,15 @@ import { selectAuthIsReady, selectUser } from '@/presentation/state/redux/select
 import { formatDate } from '@/core/utils/dateUtils.ts';
 import { AppDispatch, RootState } from '@/presentation/state/redux/store/store.ts';
 import { fetchAmountToPay, initializeDatabase } from '@/presentation/state/redux/store/readingSlice.ts';
+import { useNavigation } from '@react-navigation/native';
+import type { NavigationProp } from '@react-navigation/native';
+
+// Définir le type des paramètres de navigation
+type RootStackParamList = {
+    ProfilScreen: undefined;
+};
+
+type NavigationProps = NavigationProp<RootStackParamList>;
 
 // Fonction pour formater le montant avec des séparateurs de milliers
 const formatAmount = (amount: number): string => {
@@ -23,6 +32,7 @@ const formatAmount = (amount: number): string => {
 
 const HouseProfileCard = () => {
     const dispatch = useDispatch<AppDispatch>();
+    const navigation = useNavigation<NavigationProps>();
     const { totalAmountToPay, isDbReady } = useSelector((state: RootState) => state.reading);
     const isAuthReady = useSelector(selectAuthIsReady);
     const user = useSelector(selectUser);
@@ -40,6 +50,9 @@ const HouseProfileCard = () => {
         }
     }, [isDbReady, isAuthReady, user, dispatch]);
 
+    const navigateToProfile = () => {
+        navigation.navigate("ProfilScreen");
+    };
     return (
         <TouchableOpacity style={styles.card}>
             <View style={styles.header}>
@@ -50,7 +63,9 @@ const HouseProfileCard = () => {
                 <View style={styles.nameSection}>
                     <Text style={styles.houseName}>{displayName}</Text>
                 </View>
-                <Icon name="chevron-right" size={24} color="#4A90E2" />
+                <TouchableOpacity onPress={navigateToProfile}>
+                    <Icon name="chevron-right" size={24} color="#4A90E2" />
+                </TouchableOpacity>
             </View>
             <View style={styles.separator} />
             <View style={styles.footer}>

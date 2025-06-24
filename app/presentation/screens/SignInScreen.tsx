@@ -140,6 +140,7 @@ const SignInScreen: React.FC = () => {
                 onSubmitEditing={() => passwordRef.current?.focus()}
                 blurOnSubmit={false}
                 autoCapitalize="none"
+                iconName={"mail"}
             />
 
             <FormInput
@@ -152,6 +153,7 @@ const SignInScreen: React.FC = () => {
                 returnKeyType="done"
                 ref={passwordRef}
                 onSubmitEditing={handleSignIn}
+                iconName={"password"}
             />
 
             <Animated.View style={{ transform: [{ scale: submitAnim }] }}>
@@ -160,7 +162,7 @@ const SignInScreen: React.FC = () => {
                     onPress={handleSignIn}
                     loading={isSubmitting}
                     style={styles.submitButton}
-                    size="large"
+                    size="small"
                 />
             </Animated.View>
 
@@ -168,7 +170,7 @@ const SignInScreen: React.FC = () => {
                 title="Pas de compte ? S'inscrire"
                 onPress={() => navigation.navigate("SignUp")}
                 style={styles.signUpButton}
-                size="large"
+                size="small"
             />
 
             {error && <Text style={styles.errorText}>{error}</Text>}

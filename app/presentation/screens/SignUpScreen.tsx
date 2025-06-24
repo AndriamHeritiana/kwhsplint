@@ -192,6 +192,7 @@ const SignUpScreen: React.FC<RegistrationFormProps> = ({ onFocusChange }) => {
                 autoCapitalize="words"
                 onFocus={() => onFocusChange?.(true)}
                 onBlur={() => onFocusChange?.(false)}
+                iconName={"person"}
             />
             <FormInput
                 label="Email Address"
@@ -206,6 +207,7 @@ const SignUpScreen: React.FC<RegistrationFormProps> = ({ onFocusChange }) => {
                 ref={emailRef}
                 onFocus={() => onFocusChange?.(true)}
                 onBlur={() => onFocusChange?.(false)}
+                iconName={"email"}
             />
             <FormInput
                 label="Password"
@@ -220,6 +222,7 @@ const SignUpScreen: React.FC<RegistrationFormProps> = ({ onFocusChange }) => {
                 ref={passwordRef}
                 onFocus={() => onFocusChange?.(true)}
                 onBlur={() => onFocusChange?.(false)}
+                iconName={"password"}
             />
             <GeoLocationInfo />
             <View style={styles.coordinatesContainer}>
@@ -237,6 +240,7 @@ const SignUpScreen: React.FC<RegistrationFormProps> = ({ onFocusChange }) => {
                         ref={latitudeRef}
                         onFocus={() => onFocusChange?.(true)}
                         onBlur={() => onFocusChange?.(false)}
+                        iconName={"maps-home-work"}
                     />
                 </View>
                 <View style={styles.coordinateField}>
@@ -251,6 +255,7 @@ const SignUpScreen: React.FC<RegistrationFormProps> = ({ onFocusChange }) => {
                         ref={longitudeRef}
                         onFocus={() => onFocusChange?.(true)}
                         onBlur={() => onFocusChange?.(false)}
+                        iconName={"maps-home-work"}
                     />
                 </View>
             </View>
@@ -260,7 +265,7 @@ const SignUpScreen: React.FC<RegistrationFormProps> = ({ onFocusChange }) => {
                     onPress={handleSubmit}
                     loading={isSubmitting}
                     style={styles.submitButton}
-                    size="large"
+                    size="small"
                 />
             </Animated.View>
             </ScrollView>

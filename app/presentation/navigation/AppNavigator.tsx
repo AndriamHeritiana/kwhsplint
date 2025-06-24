@@ -15,6 +15,7 @@ import History from '../screens/History';
 import Setting from '../screens/Setting';
 import SignInScreen from '../screens/SignInScreen';
 import SignUpScreen from '../screens/SignUpScreen';
+import ProfilScreen from '../screens/profil/ProfilScreen';
 import { navigationRef } from './ref/navigationRef';
 import Toast from 'react-native-toast-message';
 
@@ -113,7 +114,10 @@ const AppNavigator = () => {
         <NavigationContainer ref={navigationRef}>
             <Stack.Navigator screenOptions={{ headerShown: false }}>
                 {user ? (
-                    <Stack.Screen name="Main" component={TabNavigator} />
+                    <>
+                        <Stack.Screen name="Main" component={TabNavigator} />
+                        <Stack.Screen name="ProfilScreen" component={ProfilScreen} />
+                    </>
                 ) : (
                     <>
                         <Stack.Screen name="SignIn" component={SignInScreen} />

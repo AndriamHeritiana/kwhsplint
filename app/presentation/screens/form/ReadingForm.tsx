@@ -20,7 +20,7 @@ import { readingFormValidationSchema } from '@/presentation/screens/schema/valid
 import { selectAuthIsReady, selectUser } from '@/presentation/state/redux/selectors/authSelectors.ts';
 import {fetchLatestReading} from "@/presentation/state/redux/store/readingSlice.ts";
 import FormContent from './FormContent';
-import { parseAddress } from '@/core/utils/addressUtils'
+import { parseAddress } from '@/core/utils/addressUtils';
 const ReadingForm = () => {
     const dispatch = useDispatch<AppDispatch>();
     const { loading, error, isDbReady, latestReading } = useSelector((state: RootState) => state.reading);
