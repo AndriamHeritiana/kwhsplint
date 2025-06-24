@@ -143,6 +143,126 @@ export class SQLiteService {
         }
         return 0.0;
     }
+
+
+    /**
+     * Calcule le pourcentage de variation du montant à payer par rapport au mois précédent
+     * @param userId L'identifiant de l'utilisateur
+     * @returns Le pourcentage de variation (positif = augmentation, négatif = diminution)
+     */
+    async getAmountToPayPercentageChange(userId: string): Promise<{
+        currentMonthAmount: number;
+        previousMonthAmount: number;
+        percentageChange: number;
+        hasData: boolean;
+    } | null> {
+        if (!this.db) throw new Error('Database not initialized');
+
+        // Option 1: Comparer les 2 dernières lectures individuelles
+        const lastTwoReadingsQuery = `
+            SELECT amountToPay
+            FROM readings
+            WHERE userId = ?
+            ORDER BY newInputDate DESC, id DESC
+                LIMIT 2
+        `;
+
+        const [results] = await this.db.executeSql(lastTwoReadingsQuery, [userId]);
+
+        if (results.rows.length < 2) {
+            return {
+                currentMonthAmount: results.rows.length === 1 ? results.rows.item(0).amountToPay : 0,
+                previousMonthAmount: 0,
+                percentageChange: 0,
+                hasData: false
+            };
+        }
+
+        const currentAmount = results.rows.item(0).amountToPay;
+        const previousAmount = results.rows.item(1).amountToPay;
+
+        let percentageChange = 0;
+        if (previousAmount > 0) {
+            percentageChange = ((currentAmount - previousAmount) / previousAmount) * 100;
+        }
+
+        return {
+            currentMonthAmount: currentAmount,
+            previousMonthAmount: previousAmount,
+            percentageChange: Math.round(percentageChange * 100) / 100,
+            hasData: true
+        };
+    }
+
+
+    // Si par raport au Total :
+    // async getAmountToPayPercentageChange(userId: string): Promise<{
+    //     currentMonthAmount: number;
+    //     previousMonthAmount: number;
+    //     percentageChange: number;
+    //     hasData: boolean;
+    // } | null> {
+    //     if (!this.db) throw new Error('Database not initialized');
+    //
+    //     // Récupérer les 2 dernières lectures
+    //     const lastTwoReadingsQuery = `
+    //     SELECT amountToPay
+    //     FROM readings
+    //     WHERE userId = ?
+    //     ORDER BY newInputDate DESC, id DESC
+    //     LIMIT 2
+    // `;
+    //
+    //     const [results] = await this.db.executeSql(lastTwoReadingsQuery, [userId]);
+    //
+    //     if (results.rows.length < 2) {
+    //         console.log('Pas assez de lectures:', results.rows.length);
+    //         return {
+    //             currentMonthAmount: results.rows.length === 1 ? results.rows.item(0).amountToPay : 0,
+    //             previousMonthAmount: 0,
+    //             percentageChange: 0,
+    //             hasData: false
+    //         };
+    //     }
+    //
+    //     const currentAmount = results.rows.item(0).amountToPay;
+    //     const previousAmount = results.rows.item(1).amountToPay;
+    //
+    //     // Récupérer la somme totale de tous les amountToPay
+    //     const totalAmountQuery = `
+    //     SELECT SUM(amountToPay) as totalAmount
+    //     FROM readings
+    //     WHERE userId = ?
+    // `;
+    //
+    //     const [totalResults] = await this.db.executeSql(totalAmountQuery, [userId]);
+    //     const totalAmount = totalResults.rows.item(0).totalAmount || 0;
+    //
+    //     // Calculer le pourcentage par rapport à la somme totale
+    //     let percentageChange = 0;
+    //     if (totalAmount > 0) {
+    //         // Différence entre la lecture actuelle et précédente
+    //         const difference = currentAmount - previousAmount;
+    //         // Pourcentage par rapport au total
+    //         percentageChange = (difference / totalAmount) * 100;
+    //     }
+    //
+    //     console.log('Comparaison:', {
+    //         currentAmount,
+    //         previousAmount,
+    //         totalAmount,
+    //         difference: currentAmount - previousAmount,
+    //         percentageChange
+    //     });
+    //
+    //     return {
+    //         currentMonthAmount: currentAmount,
+    //         previousMonthAmount: previousAmount,
+    //         percentageChange: Math.round(percentageChange * 100) / 100,
+    //         hasData: true
+    //     };
+    // }
+
     async closeDatabase(): Promise<void> {
         if (this.db) {
             await this.db.close();

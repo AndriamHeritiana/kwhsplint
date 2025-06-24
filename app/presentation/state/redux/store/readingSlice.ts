@@ -8,6 +8,7 @@ import { GetTwoLastHistoryUseCase } from '@/core/domain/usecases/GetTwoLastHisto
 import { GetAmountToPayUseCase } from '@/core/domain/usecases/user/GetAmountToPayUseCase.ts';
 import { GetLatestMeterAndDateReadingUseCase } from '@/core/domain/usecases/reading/GetLatestMeterAndDateReading.ts';
 import { GetTotalConsomptionUseCase } from '@/core/domain/usecases/reading/GetTotalConsomptionUseCase.ts';
+import { GetAmountToPayPercentageChangeUseCase } from '@/core/domain/usecases/reading/GetAmountToPayPercentageChangeUseCase.ts';
 // Initialisation des services
 const sqliteService = new SQLiteService();
 const readingRepository = new ReadingRepositoryImpl(sqliteService);
@@ -17,6 +18,7 @@ const addReadingUseCase = new AddReadingUseCase(readingRepository);
 const getAmountToPayUseCase = new GetAmountToPayUseCase(readingRepository);
 const getLatestMeterAndDateReadingUseCase = new GetLatestMeterAndDateReadingUseCase(readingRepository);
 const getTotalConsumptionUseCase = new GetTotalConsomptionUseCase(readingRepository);
+const getAmountToPayPercentageChangeUseCase = new GetAmountToPayPercentageChangeUseCase(readingRepository);
 // État initial
 interface ReadingState {
     homeReadings: Reading[];
@@ -24,6 +26,12 @@ interface ReadingState {
     totalAmountToPay: number;
     totalConsumption: number;
     latestReading: { newInputDate: string; newSubMeterValue: number } | null;
+    amountToPayPercentageChange: {
+        currentMonthAmount: number;
+        previousMonthAmount: number;
+        percentageChange: number;
+        hasData: boolean;
+    } | null;
     loading: boolean;
     error: string | null;
     isDbReady: boolean;
@@ -35,6 +43,7 @@ const initialState: ReadingState = {
     totalAmountToPay: 0.0,
     totalConsumption: 0.0,
     latestReading: null,
+    amountToPayPercentageChange: null,
     loading: false,
     error: null,
     isDbReady: false,
@@ -92,6 +101,14 @@ export const fetchTotalConsumption = createAsyncThunk(
     'reading/fetchTotalConsumption',
     async (userId: string) => {
         return await getTotalConsumptionUseCase.execute(userId);
+    }
+);
+
+// Thunk pour récupérer le pourcentage de changement de la somme totale à payer
+export const fetchAmountToPayPercentageChange = createAsyncThunk(
+    'reading/fetchAmountToPayPercentageChange',
+    async (userId: string) => {
+        return await getAmountToPayPercentageChangeUseCase.execute(userId);
     }
 );
 // Slice Redux
@@ -188,6 +205,17 @@ const readingSlice = createSlice({
             .addCase(fetchTotalConsumption.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.error.message || "Error when recovering total consumption";
+            })
+            .addCase(fetchAmountToPayPercentageChange.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(fetchAmountToPayPercentageChange.fulfilled, (state, action) => {
+                state.amountToPayPercentageChange = action.payload;
+                state.loading = false;
+            })
+            .addCase(fetchAmountToPayPercentageChange.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message || "Erreur lors de la récupération du pourcentage de changement du montant";
             });
     },
 });

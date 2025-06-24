@@ -28,4 +28,12 @@ export class ReadingRepositoryImpl implements ReadingRepository {
     async getTotalElectricConsumption(userId: string): Promise<number> {
         return await this.sqliteService.getTotalElectricConsumption(userId);
     }
+    async getAmountToPayPercentageChange(userId:string):Promise<{
+        currentMonthAmount: number;
+        previousMonthAmount: number;
+        percentageChange: number;
+        hasData: boolean}| null>
+    {
+        return await this.sqliteService.getAmountToPayPercentageChange(userId);
+    }
 }

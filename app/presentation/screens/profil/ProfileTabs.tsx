@@ -3,23 +3,90 @@ import {useDispatch, useSelector} from "react-redux";
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { colors } from "@/state/context/styles/colors.ts";
-import {fetchTotalConsumption} from "@/presentation/state/redux/store/readingSlice.ts";
+import {fetchTotalConsumption, fetchAmountToPayPercentageChange} from "@/presentation/state/redux/store/readingSlice.ts";
 import {AppDispatch} from "@/presentation/state/redux/store/store.ts";
+
 interface ProfileTabsProps {
     userId: string;
 }
+
 export const ProfileTabs = ({ userId }: ProfileTabsProps) => {
     const dispatch = useDispatch<AppDispatch>();
     const [activeTab, setActiveTab] = useState('totalKwh');
-    const { totalAmountToPay, totalConsumption } = useSelector((state: any) => state.reading);
+    const { totalAmountToPay, totalConsumption, amountToPayPercentageChange } = useSelector((state: any) => state.reading);
+    console.log(userId);
     useEffect(() => {
-            dispatch(fetchTotalConsumption(userId));
-    }, [ userId, dispatch]);
+        dispatch(fetchTotalConsumption(userId));
+        dispatch(fetchAmountToPayPercentageChange(userId));
+    }, [userId, dispatch]);
+
     const tabs = [
         { id: 'totalKwh', label: 'Consumption', icon: 'tachometer' },
         { id: 'totalPaid', label: 'Paid amount', icon: 'dollar' },
         { id: 'comparison', label: 'Comparison', icon: 'balance-scale' },
     ];
+
+    const renderComparisonContent = () => {
+        if (!amountToPayPercentageChange) {
+            return (
+                <Text style={styles.tabContentText}>
+                    Loading comparison data...
+                </Text>
+            );
+        }
+
+        if (!amountToPayPercentageChange.hasData) {
+            console.log(amountToPayPercentageChange.hasData);
+            return (
+                <Text style={styles.tabContentText}>
+                    Not enough data for comparison. Add more readings to see monthly comparison.
+                </Text>
+            );
+        }
+
+        const { percentageChange, currentMonthAmount, previousMonthAmount } = amountToPayPercentageChange;
+
+        // Déterminer l'icône et la couleur selon le changement
+        let comparisonIcon = 'minus';
+        let comparisonColor = colors.neutral[600];
+        let comparisonText = '';
+
+        if (percentageChange > 0) {
+            comparisonIcon = 'arrow-up';
+            comparisonColor = '#E74C3C'; // Rouge pour augmentation
+            comparisonText = `+${percentageChange.toFixed(1)}%`;
+        } else if (percentageChange < 0) {
+            comparisonIcon = 'arrow-down';
+            comparisonColor = '#27AE60'; // Vert pour diminution
+            comparisonText = `${percentageChange.toFixed(1)}%`;
+        } else {
+            comparisonIcon = 'minus';
+            comparisonColor = colors.neutral[600];
+            comparisonText = '0%';
+        }
+
+        return (
+            <View style={styles.comparisonContent}>
+                <View style={styles.comparisonHeader}>
+                    <Icon name={comparisonIcon} size={16} color={comparisonColor} />
+                    <Text style={[styles.percentageText, { color: comparisonColor }]}>
+                        {comparisonText}
+                    </Text>
+                </View>
+                <Text style={styles.tabContentText}>
+                    Comparison with the previous month
+                </Text>
+                <View style={styles.comparisonDetails}>
+                    <Text style={styles.detailText}>
+                        Current: {currentMonthAmount.toLocaleString('fr-FR')} Ar
+                    </Text>
+                    <Text style={styles.detailText}>
+                        Previous: {previousMonthAmount.toLocaleString('fr-FR')} Ar
+                    </Text>
+                </View>
+            </View>
+        );
+    };
 
     const renderTabContent = () => {
         switch (activeTab) {
@@ -51,9 +118,7 @@ export const ProfileTabs = ({ userId }: ProfileTabsProps) => {
                         <View style={styles.chevronContainer}>
                             <Icon name="info-circle" size={18} color="#4A90E2" />
                         </View>
-                        <Text style={styles.tabContentText}>
-                            Comparison with the previous month: -10%
-                        </Text>
+                        {renderComparisonContent()}
                     </View>
                 );
             default:
@@ -150,5 +215,28 @@ const styles = StyleSheet.create({
     activeTabText: {
         color: colors.primary[500],
         fontWeight: '600',
+    },
+    // Nouveaux styles pour la comparaison
+    comparisonContent: {
+        alignItems: 'center',
+    },
+    comparisonHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 8,
+    },
+    percentageText: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginLeft: 8,
+    },
+    comparisonDetails: {
+        marginTop: 8,
+        alignItems: 'center',
+    },
+    detailText: {
+        fontSize: 12,
+        color: colors.neutral[600],
+        marginVertical: 2,
     },
 });

@@ -6,4 +6,9 @@ export interface ReadingRepository {
     getTotalAmountToPay(userId: string): Promise<number>;
     getLatestMeterAndDateReading(userId: string): Promise<{ newInputDate: string; newSubMeterValue: number } | null>;
     getTotalElectricConsumption(userId: string): Promise<number>;
+    getAmountToPayPercentageChange(userId: string): Promise<{
+        currentMonthAmount: number;
+        previousMonthAmount: number;
+        percentageChange: number;
+        hasData: boolean}| null>;
 }
