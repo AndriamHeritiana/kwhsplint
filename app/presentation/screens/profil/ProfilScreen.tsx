@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet} from 'react-native';
 import { useSelector } from 'react-redux';
 import { selectUser } from '@/presentation/state/redux/selectors/authSelectors.ts';
 import { useNavigation } from '@react-navigation/native';
@@ -11,23 +11,27 @@ import { ProfileHeader } from "@/presentation/screens/profil/ProfileHeader.tsx";
 const ProfilScreen = () => {
     const navigation = useNavigation();
     const user = useSelector(selectUser);
-    const displayName = user?.displayName || 'Utilisateur';
-    const photoURL = user?.photoURL || 'public/images/default.jpg';
-    const email = user?.email || 'email@exemple.com';
-    const latitude = user?.latitude;
-    const longitude = user?.longitude;
-    const address = user?.address;
-
     const handleBackPress = () => {
         navigation.goBack();
     };
 
     return (
         <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-            <ProfileHeader displayName={displayName} onBackPress={handleBackPress} />
-            <UserInfo photoURL={photoURL} displayName={displayName} email={email} />
-            <ProfileTabs />
-            <LeafletMap latitude={latitude} longitude={longitude} address={address} />
+            <ProfileHeader
+                displayName={user?.displayName || 'Utilisateur'}
+                onBackPress={handleBackPress} />
+            <UserInfo
+                photoURL={user?.photoURL || 'public/images/default.jpg'}
+                displayName={user?.displayName || 'Utilisateur'}
+                email={user?.email || 'user@kwhsplint.com'} />
+            {user?.id &&
+                <ProfileTabs
+                userId={user?.id}
+            />}
+            <LeafletMap
+                latitude={user?.latitude}
+                longitude={user?.longitude}
+                address={user?.address} />
         </ScrollView>
     );
 };

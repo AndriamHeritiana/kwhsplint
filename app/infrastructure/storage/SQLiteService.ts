@@ -119,6 +119,30 @@ export class SQLiteService {
         }
         return null;
     }
+
+    /**
+     * Calculate the total electricity consumption of a user
+     * Consumption for each reading = Newsubmetervalue - Oldsubmetervalue
+     * @param userId User identifier
+     * @returns Total consumption in kWh
+     */
+    async getTotalElectricConsumption(userId: string): Promise<number> {
+        if (!this.db) throw new Error('Database not initialized');
+
+        const query = `
+            SELECT SUM(newSubMeterValue - oldSubMeterValue) as totalConsumption 
+            FROM readings 
+            WHERE userId = ?
+        `;
+        const params = [userId];
+        const [results] = await this.db.executeSql(query, params);
+
+        if (results.rows.length > 0) {
+            const totalConsumption = results.rows.item(0).totalConsumption;
+            return totalConsumption !== null && typeof totalConsumption === 'number' ? totalConsumption : 0.0;
+        }
+        return 0.0;
+    }
     async closeDatabase(): Promise<void> {
         if (this.db) {
             await this.db.close();

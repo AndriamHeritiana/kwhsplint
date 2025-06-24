@@ -1,12 +1,20 @@
-import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import React, {useEffect, useState} from "react";
+import {useDispatch, useSelector} from "react-redux";
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { colors } from "@/state/context/styles/colors.ts";
-export const ProfileTabs = () => {
+import {fetchTotalConsumption} from "@/presentation/state/redux/store/readingSlice.ts";
+import {AppDispatch} from "@/presentation/state/redux/store/store.ts";
+interface ProfileTabsProps {
+    userId: string;
+}
+export const ProfileTabs = ({ userId }: ProfileTabsProps) => {
+    const dispatch = useDispatch<AppDispatch>();
     const [activeTab, setActiveTab] = useState('totalKwh');
-    const { totalAmountToPay } = useSelector((state: any) => state.reading); // À ajuster selon votre state Redux
-
+    const { totalAmountToPay, totalConsumption } = useSelector((state: any) => state.reading);
+    useEffect(() => {
+            dispatch(fetchTotalConsumption(userId));
+    }, [ userId, dispatch]);
     const tabs = [
         { id: 'totalKwh', label: 'Consumption', icon: 'tachometer' },
         { id: 'totalPaid', label: 'Paid amount', icon: 'dollar' },
@@ -19,10 +27,10 @@ export const ProfileTabs = () => {
                 return (
                     <View style={styles.tabContent}>
                         <View style={styles.chevronContainer}>
-                            <Icon name="chevron-up" size={18} color="#4A90E2" />
+                            <Icon name="info-circle" size={18} color="#4A90E2" />
                         </View>
                         <Text style={styles.tabContentText}>
-                            Total consumption: 1234 kWh
+                            Total consumption: {totalConsumption ? `${totalConsumption.toLocaleString('fr-FR')} KWh` : '0 KWh'}
                         </Text>
                     </View>
                 );
@@ -30,7 +38,7 @@ export const ProfileTabs = () => {
                 return (
                     <View style={styles.tabContent}>
                         <View style={styles.chevronContainer}>
-                            <Icon name="chevron-up" size={18} color="#4A90E2" />
+                            <Icon name="info-circle" size={18} color="#4A90E2" />
                         </View>
                         <Text style={styles.tabContentText}>
                             Total amount paid: {totalAmountToPay ? `${totalAmountToPay.toLocaleString('fr-FR')} Ar` : '0 Ar'}.
@@ -41,7 +49,7 @@ export const ProfileTabs = () => {
                 return (
                     <View style={styles.tabContent}>
                         <View style={styles.chevronContainer}>
-                            <Icon name="chevron-up" size={18} color="#4A90E2" />
+                            <Icon name="info-circle" size={18} color="#4A90E2" />
                         </View>
                         <Text style={styles.tabContentText}>
                             Comparison with the previous month: -10%

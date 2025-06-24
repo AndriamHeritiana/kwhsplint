@@ -7,7 +7,7 @@ import { AddReadingUseCase } from '@/core/domain/usecases/AddReadingUseCase.ts';
 import { GetTwoLastHistoryUseCase } from '@/core/domain/usecases/GetTwoLastHistoryUseCase';
 import { GetAmountToPayUseCase } from '@/core/domain/usecases/user/GetAmountToPayUseCase.ts';
 import { GetLatestMeterAndDateReadingUseCase } from '@/core/domain/usecases/reading/GetLatestMeterAndDateReading.ts';
-
+import { GetTotalConsomptionUseCase } from '@/core/domain/usecases/reading/GetTotalConsomptionUseCase.ts';
 // Initialisation des services
 const sqliteService = new SQLiteService();
 const readingRepository = new ReadingRepositoryImpl(sqliteService);
@@ -16,12 +16,13 @@ const getTwoLastHistoryUseCase = new GetTwoLastHistoryUseCase(readingRepository)
 const addReadingUseCase = new AddReadingUseCase(readingRepository);
 const getAmountToPayUseCase = new GetAmountToPayUseCase(readingRepository);
 const getLatestMeterAndDateReadingUseCase = new GetLatestMeterAndDateReadingUseCase(readingRepository);
-
+const getTotalConsumptionUseCase = new GetTotalConsomptionUseCase(readingRepository);
 // État initial
 interface ReadingState {
     homeReadings: Reading[];
     historyReadings: Reading[];
     totalAmountToPay: number;
+    totalConsumption: number;
     latestReading: { newInputDate: string; newSubMeterValue: number } | null;
     loading: boolean;
     error: string | null;
@@ -32,6 +33,7 @@ const initialState: ReadingState = {
     homeReadings: [],
     historyReadings: [],
     totalAmountToPay: 0.0,
+    totalConsumption: 0.0,
     latestReading: null,
     loading: false,
     error: null,
@@ -85,7 +87,13 @@ export const fetchLatestReading = createAsyncThunk(
         return await getLatestMeterAndDateReadingUseCase.execute(userId);
     }
 );
-
+// Thunk to recover total consumption
+export const fetchTotalConsumption = createAsyncThunk(
+    'reading/fetchTotalConsumption',
+    async (userId: string) => {
+        return await getTotalConsumptionUseCase.execute(userId);
+    }
+);
 // Slice Redux
 const readingSlice = createSlice({
     name: 'reading',
@@ -168,7 +176,18 @@ const readingSlice = createSlice({
             })
             .addCase(fetchLatestReading.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.error.message || "Erreur lors de la récupération de la dernière lecture";
+                state.error = action.error.message || "Error when recovering the last reading";
+            })
+            .addCase(fetchTotalConsumption.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(fetchTotalConsumption.fulfilled, (state, action) => {
+                state.totalConsumption = action.payload;
+                state.loading = false;
+            })
+            .addCase(fetchTotalConsumption.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message || "Error when recovering total consumption";
             });
     },
 });

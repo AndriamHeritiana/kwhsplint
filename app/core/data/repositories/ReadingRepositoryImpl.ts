@@ -25,4 +25,7 @@ export class ReadingRepositoryImpl implements ReadingRepository {
     async getLatestMeterAndDateReading(userId: string): Promise<{ newInputDate: string; newSubMeterValue: number } | null> {
         return await this.sqliteService.getLatestMeterAndDateReading(userId);
     }
+    async getTotalElectricConsumption(userId: string): Promise<number> {
+        return await this.sqliteService.getTotalElectricConsumption(userId);
+    }
 }
