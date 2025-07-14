@@ -18,6 +18,7 @@ import SignUpScreen from '../screens/SignUpScreen';
 import ProfilScreen from '../screens/profil/ProfilScreen';
 import { navigationRef } from './ref/navigationRef';
 import Toast from 'react-native-toast-message';
+import 'react-native-url-polyfill/auto';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -105,7 +106,6 @@ const TabNavigator = () => {
 const AppNavigator = () => {
     const dispatch = useDispatch<AppDispatch>();
     const user = useSelector(selectUser);
-
     useEffect(() => {
         dispatch(getCurrentUser());
     }, [dispatch]);

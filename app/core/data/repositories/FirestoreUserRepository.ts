@@ -3,7 +3,7 @@ import firestore from '@react-native-firebase/firestore';
 export class FirestoreUserRepository {
   async getUserData(
     uid: string,
-  ): Promise<{address?: string; latitude?: string; longitude?: string}> {
+  ): Promise<{address?: string; latitude?: string; longitude?: string; photoURL?: string}> {
     try {
       const userDoc = await firestore().collection('users').doc(uid).get();
       // @ts-ignore
@@ -22,6 +22,7 @@ export class FirestoreUserRepository {
       latitude: string;
       longitude: string;
       createdAt: string;
+      photoURL?: string |'';
     },
   ) {
     try {
@@ -32,4 +33,14 @@ export class FirestoreUserRepository {
       );
     }
   }
+    async updatePhotoUrl(uid: string, photoURL: string): Promise<void> {
+        try {
+            await firestore().collection('users').doc(uid).set(
+                { photoURL },
+                { merge: true }
+            );
+        } catch (error: any) {
+            throw new Error(`Erreur lors de la mise à jour de la photo : ${error.message}`);
+        }
+    }
 }

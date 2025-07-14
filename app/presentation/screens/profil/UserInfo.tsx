@@ -1,10 +1,47 @@
 import {Image, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import { launchImageLibrary } from 'react-native-image-picker';
+import { uploadProfileImage } from "@/infrastructure/services/SupabaseService";
 import Icon from "react-native-vector-icons/FontAwesome";
-import React from "react";
+import React, {useState} from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getUpdatePhoto } from "@/presentation/state/redux/slices/userSlices.ts";
+import {AppDispatch, RootState} from "@/presentation/state/redux/store/store.ts";
 
-export const UserInfo = ({ photoURL, displayName, email }: { photoURL: string; displayName: string; email: string }) => {
-    const handleEditPhoto = () => {
-        console.log('Modifier la photo de profil');
+export const UserInfo = ({ photoURL, displayName, email, userId }: { photoURL: string; displayName: string; email: string; userId:string }) => {
+
+    const { user, loading, error } = useSelector((state: RootState) => state.user);
+    const dispatch = useDispatch<AppDispatch>();
+    const handleEditPhoto = async () => {
+        try {
+            // Ouvre la bibliothèque d'images
+            const result = await launchImageLibrary({
+                mediaType: 'photo',
+                maxWidth: 1000,
+                maxHeight: 1000,
+                quality: 0.7,
+            });
+
+            if (result.didCancel || !result.assets || !result.assets[0]) {
+                console.log('Sélection d\'image annulée');
+                return;
+            }
+            const file = {
+                uri: result.assets[0].uri!,
+                name: `profile_${userId}.jpg`,
+                type: result.assets[0].type || 'image/jpeg',
+            };
+
+            if (userId){
+                const newPhotoURL = await uploadProfileImage(userId, file);
+                if (newPhotoURL) {
+                    console.log('Image téléversée avec succès, nouvelle URL :', newPhotoURL);
+                    // setLocalPhotoURL(newPhotoURL); // Mettez à jour l'affichage local
+                    await dispatch(getUpdatePhoto(newPhotoURL)).unwrap();
+                }
+            }
+        } catch (error) {
+            console.error('Erreur lors de la sélection ou du téléversement de l\'image :', error);
+        }
     };
 
     return (

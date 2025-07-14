@@ -7,6 +7,8 @@ import { GetCurrentUserUseCase } from '@/core/domain/usecases/user/GetCurrentUse
 import { NominatimGeocodingService} from "@/infrastructure/services/NominatimGeocodingService.ts";
 import {FirebaseAuthService} from "@/infrastructure/services/FirebaseAuthService.ts";
 import {FirestoreUserRepository} from "@/core/data/repositories/FirestoreUserRepository.ts";
+import { UpdatePhotoUrlUseCase} from "@/core/domain/usecases/user/UpdatePhotoUrlUseCase.ts";
+import {FirebaseUserDataSource} from "@/core/data/datasources/FirebaseUserDataSource.ts";
 
 export class FirebaseService {
     private static geocodingService = new NominatimGeocodingService();
@@ -14,7 +16,8 @@ export class FirebaseService {
     private static userRepository = new FirestoreUserRepository();
     private static authDataSource = new FirebaseAuthDataSource(this.authService, this.userRepository, this.geocodingService);
     private static authRepository = new AuthRepositoryImpl(this.authDataSource);
-
+    // for user
+    private static userDataSource = new FirebaseUserDataSource(this.authService, this.userRepository);
     static getSignInUseCase(): SignInUseCase {
         return new SignInUseCase(this.authRepository);
     }
@@ -29,5 +32,8 @@ export class FirebaseService {
 
     static getGetCurrentUserUseCase(): GetCurrentUserUseCase {
         return new GetCurrentUserUseCase(this.authRepository);
+    }
+    static getUpdatePhotoUrlUseCase(): UpdatePhotoUrlUseCase {
+        return new UpdatePhotoUrlUseCase(this.userDataSource);
     }
 }
