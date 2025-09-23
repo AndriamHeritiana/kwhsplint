@@ -5,7 +5,6 @@ const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 // Fonction pour connecter l'utilisateur
-// Fonction pour connecter l'utilisateur
 export const signIn = async (email: string, password: string) => {
     try {
         const { data, error } = await supabase.auth.signInWithPassword({
